@@ -1,0 +1,5 @@
+Flask==0.10.1
+requests==2.4.3
+pyquery==1.2.9
+lxml==3.4.0
+xmltodict==0.9.0
