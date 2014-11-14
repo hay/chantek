@@ -8,7 +8,7 @@ methods = ("entity", "search", "query")
 
 def run(args, method):
     if "q" not in args:
-        return { "error" : "No query given" }
+        raise Exception("No query given")
 
     opts = {
         "q" : args["q"],

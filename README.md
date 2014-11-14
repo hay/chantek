@@ -41,5 +41,10 @@ A command can be known under several aliases, that do nothing more than give the
 
     # This command can be reached under both 'hello' and 'hola'
 
+## Cacheable
+To indicate that a command is cacheable simple write a constant in your command like this:
+
+    CACHEABLE = True
+
 # Who's Chantek?
 "Api" pronounced in Dutch means "monkey", and [Chantek](https://en.wikipedia.org/wiki/Chantek) is a very special monkey. He's mastered sign language, and even understands spoken English. Given the fact that API's are all about communication, it made sense to name a HTTP server after a monkey that speaks English.

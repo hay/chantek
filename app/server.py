@@ -1,12 +1,14 @@
 import argparse, os, json, glob, time
 from flask import Flask, request, make_response
 from config import PATH
+from __init__ import __version__
 
 app = Flask(__name__)
 debug = False
 commands = {}
 COMMANDS_PATH = PATH + "/commands"
 cache = {}
+version = __version__
 
 def create_app():
     parse_commands()
@@ -52,6 +54,34 @@ def error(msg):
         { "error" : msg }
     )
 
+def execute_command(url, params, cmd, cmdmethod, name):
+    # Determine if the command is cacheable, and if so, check
+    # if its in the cache
+    # TODO: This truly needs some refactoring
+    if hasattr(cmd, "CACHEABLE") and cmd.CACHEABLE == True:
+        if url in cache:
+            response = cache[url]
+        else:
+            if hasattr(cmd, "methods"):
+                if cmdmethod and cmdmethod in cmd.methods:
+                    response = cmd.run(params, cmdmethod)
+                else:
+                    raise Exception("Invalid method for <%s>" % name)
+            else:
+                response = cmd.run(params)
+
+            cache[url] = response
+    else:
+        if hasattr(cmd, "methods"):
+            if cmdmethod in cmd.methods:
+                response = cmd.run(params, cmdmethod)
+            else:
+                raise Exception("Invalid method for <%s>" % name)
+        else:
+            response = cmd.run(params)
+
+    return response
+
 def run_command(cmdname, cmdmethod = None):
     if cmdname not in commands:
         return error("unknown command")
@@ -64,41 +94,35 @@ def run_command(cmdname, cmdmethod = None):
 
     url = request.url
     params = request.args.to_dict()
-    now = time.time()
-
-    # Determine if the command is cacheable, and if so, check
-    # if its in the cache
-    # TODO: This truly needs some refactoring
-    if hasattr(cmd, "CACHEABLE") and cmd.CACHEABLE == True:
-        if url in cache:
-            response = cache[url]
-        else:
-            if hasattr(cmd, "methods"):
-                if cmdmethod and cmdmethod in cmd.methods:
-                    response = cmd.run(params, cmdmethod)
-                else:
-                    return error("Invalid method for <%s>" % name)
-            else:
-                response = cmd.run(params)
-
-            cache[url] = response
-    else:
-        if hasattr(cmd, "methods"):
-            if cmdmethod in cmd.methods:
-                response = cmd.run(params, cmdmethod)
-            else:
-                return error("Invalid method for <%s>" % name)
-        else:
-            response = cmd.run(params)
 
     data_response = {
+        "chantek" : version,
         "command" : name,
         "params" : params,
-        "response" : response
     }
 
-    return json_response(data_response)
+    try:
+        response = execute_command(
+            url = request.url,
+            params = request.args.to_dict(),
+            cmd = cmd,
+            cmdmethod = cmdmethod,
+            name = name
+        )
+    except Exception, e:
+        data_response.update({
+            "error" : {
+                "message" : "<%s>: %s" % (name, e.message)
+            },
+            "response" : False
+        })
+    else:
+        data_response.update({
+            "error" : False,
+            "response" : response
+        })
 
+    return json_response(data_response)
 
 @app.route('/')
 def root():

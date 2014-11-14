@@ -4,7 +4,7 @@ methods = ("define", "suggest", "pageviews", "linkshere", "langlinks", "statisti
 
 def run(args, method):
     if "q" not in args:
-        return { "error" : "No query given" }
+        raise Exception("No query given")
 
     opts = {
         "lang" : args.get("lang", "en"),

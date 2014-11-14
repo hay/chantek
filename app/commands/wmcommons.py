@@ -1,16 +1,18 @@
-from command import Command
 from lib import wmcommons
 
-def run(args):
-    cmd = Command(args = args)
+CACHEABLE = True
 
-    cmd.add_param("method", options = ["imageinfo"])
-    cmd.add_param("q")
-    cmd.add_param("width")
-    cmd.add_param("height")
+methods = ("imageinfo")
 
-    if cmd.has_error():
-        return cmd.get_error()
+def run(args, method):
+    if "q" not in args:
+        raise Exception("No query given")
 
-    if args["method"] == "imageinfo":
-        return wmcommons.imageinfo(cmd.get_params())
+    params ={
+        "q" : args["q"],
+        "width" : args.get("width", 300),
+        "height" : args.get("height", 300)
+    }
+
+    if method == "imageinfo":
+        return wmcommons.imageinfo(params)
