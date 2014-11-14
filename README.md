@@ -1,6 +1,6 @@
 Chantek
 =======
-A simple framework for HTTP API's that return JSON
+An unaspiring HTTP API server written in Python.
 
 ## Basic stuff
 * [Source on Github](http://github.com/hay/chantek)
