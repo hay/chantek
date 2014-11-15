@@ -278,7 +278,7 @@ class WikidataEntity:
             "flattenlanguages" : args.get("flattenlanguages") or True
         })
 
-        if "resolveimages" in args and args["resolveimages"] != False:
+        if args.get("resolveimages", False):
             entity = self.resolve_images(
                 entity,
                 args["imagewidth"],
