@@ -23,11 +23,11 @@ For a list of all commands try going to `http://localhost:5000/_commands`.
 
 All commands can be queried like this:
 
-http://localhost:5000/<command>?param1=foo&param2=bar
+    $ curl http://localhost:5000/<command>?param1=foo&param2=bar
 
 Commands with methods (see below) can be called like this:
 
-http://localhost:5000/<command>/<method>?param1=foo&param2=bar
+    $ curl http://localhost:5000/<command>/<method>?param1=foo&param2=bar
 
 Commands return their data as JSON following a consistent format:
 
@@ -64,13 +64,13 @@ Commands go in the `commands` folder. Every command should be in a subfolder, wi
 
 For example:
 
-chantek/
-    commands/
-        mycommand/
-            __init__.py
-            command.py
-            otherlib.py
-            data.json
+    chantek/
+        commands/
+            mycommand/
+                __init__.py
+                command.py
+                otherlib.py
+                data.json
 
 The simplest `command.py` file has a structure like this:
 
@@ -107,7 +107,7 @@ This will save every unique URL query to an in-memory cache.
 ## TODO
 Things that are not working yet and should be done:
 * Commands should be self-documenting, and display help in the API
-* Going to the root of the server (e.g. http://localhost:5000) should return an interactive console
+* Going to the root of the server (e.g. `http://localhost:5000`) should return an interactive console
 * More commands!
 
 ## Who's Chantek?
