@@ -12,7 +12,7 @@ def run(args, method):
     }
 
     if method == "define":
-        return dbpedia_lookup_api.define(params)
+        return lookup.define(params)
 
     if method == "suggest":
-        return dbpedia_lookup_api.suggest(params)
+        return lookup.suggest(params)
