@@ -1,27 +1,83 @@
 Chantek
 =======
 An unaspiring HTTP API server written in Python.
+Easily extended with your own commands.
+Includes default commands for querying Wikipedia, Wikidata and the Magic 8-Ball.
 
-## Basic stuff
+Try the live demo: http://chantek.bykr.org
+
+## Reference
 * [Source on Github](http://github.com/hay/chantek)
 * Written by [Hay Kranen](http://github.com/hay)
 
 ## Running
-To run the server simply run `server.py` root. There's also a `wsgi` configuration example for production use.
+To run the server simply run `server.py` in the root. There's also a `uwsgi.ini` configuration example for [production use](http://www.haykranen.nl/2014/11/15/running-a-python-flask-app-with-nginx-using-uwsgi/).
 
 For debugging purposes try running `server.py` with the `debug=1` flag:
 
     $ python server.py --debug=1
 
+This will run your Chantek server on port 5000.
+
+For a list of all commands try going to `http://localhost:5000/_commands`.
+
+All commands can be queried like this:
+
+http://localhost:5000/<command>?param1=foo&param2=bar
+
+Commands with methods (see below) can be called like this:
+
+http://localhost:5000/<command>/<method>?param1=foo&param2=bar
+
+Commands return their data as JSON following a consistent format:
+
+    $ curl http://localhost:5000/wikipedia/define?q=Chantek
+
+    {
+        // Contains the original parameters
+        "params": {
+            "q": "Chantek"
+        },
+
+        // Did an error occur during your call?
+        "error": false,
+
+        // Contains the original command
+        "command": "wikipedia",
+
+        // Response from the command
+        "response": {
+            "extract": "Chantek (born December 17, 1977, at the Yerkes Regional Primate Research Center in Atlanta, Georgia) is a male orangutan who has mastered the use of a number of intellectual skills, including sign language, taught by American anthropologists Lyn Miles and Ann Southcombe. In Malay and Indonesian, cantik (pronounced chanteek) means \"lovely\" or \"beautiful\".",
+            "ns": 0,
+            "pageid": 1577406,
+            "title": "Chantek"
+        },
+
+        // Version number
+        "chantek": "0.1.0"
+    }
+
+HTTP responses by default are [CORS](http://enable-cors.org/) enabled for use in web applications.
+
 ## Chantek Commands
 Commands go in the `commands` folder. Every command should be in a subfolder, with at least a `__init__.py` file (this should be empty) and a `command.py` file.
+
+For example:
+
+chantek/
+    commands/
+        mycommand/
+            __init__.py
+            command.py
+            otherlib.py
+            data.json
 
 The simplest `command.py` file has a structure like this:
 
     def run(args):
         return "hello world"
 
-`args` gives back all the parameters given in a query. If a query has no named parameter but does accept input (like stdin) this is given as a 'q' parameter.
+`args` gives back all the url arguments given in the query as a dict.
 
 To write a command with methods (like `command/verb`), write your command like this:
 
@@ -31,7 +87,7 @@ To write a command with methods (like `command/verb`), write your command like t
         if method == "bar":
             return "Bar!"
 
-A command can be known under several aliases, that do nothing more than give the same results under a different name.
+A command can be known under several aliases:
 
     # hello.py
 
@@ -46,5 +102,13 @@ To indicate that a command is cacheable simple write a constant in your command 
 
     CACHEABLE = True
 
+This will save every unique URL query to an in-memory cache.
+
+## TODO
+Things that are not working yet and should be done:
+* Commands should be self-documenting, and display help in the API
+* Going to the root of the server (e.g. http://localhost:5000) should return an interactive console
+* More commands!
+
 ## Who's Chantek?
-"Api" pronounced in Dutch means "monkey", and [Chantek](https://en.wikipedia.org/wiki/Chantek) is a very special monkey. He's mastered sign language, and even understands spoken English. Given the fact that API's are all about communication, it made sense to name a HTTP server after a monkey that speaks English.
+"Api" pronounced in Dutch means "monkey", and [Chantek](https://en.wikipedia.org/wiki/Chantek) is a very special monkey indeed. He's mastered sign language, and even understands spoken English. Given the fact that API's are all about communication, it made sense to name a HTTP server after a monkey that speaks English.
