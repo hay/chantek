@@ -1,6 +1,6 @@
-from lib.WikidataEntity import WikidataEntity
-from lib.WikidataSearch import WikidataSearch
-from lib.WikidataQuery import WikidataQuery
+from entity import WikidataEntity
+from search import WikidataSearch
+from query import WikidataQuery
 
 CACHEABLE = True
 

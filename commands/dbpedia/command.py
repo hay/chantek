@@ -1,4 +1,4 @@
-from lib import dbpedia_lookup_api
+import lookup
 
 methods = ("define", "suggest")
 

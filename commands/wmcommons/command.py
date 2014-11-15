@@ -1,4 +1,4 @@
-from lib import wmcommons
+import wmcommons
 
 CACHEABLE = True
 

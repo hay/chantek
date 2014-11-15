@@ -1,4 +1,4 @@
-from lib import wpapi
+import wikipedia
 
 methods = ("define", "suggest", "pageviews", "linkshere", "langlinks", "statistics")
 
@@ -12,24 +12,24 @@ def run(args, method):
     }
 
     if method == "define":
-       return wpapi.define(opts)
+       return wikipedia.define(opts)
 
     if method == "suggest":
-        return wpapi.suggest(opts)
+        return wikipedia.suggest(opts)
 
     if method == "pageviews":
-        return wpapi.pageviews(opts)
+        return wikipedia.pageviews(opts)
 
     if method == "linkshere":
-        return wpapi.linkshere(opts)
+        return wikipedia.linkshere(opts)
 
     if method == "langlinks":
-        return wpapi.langlinks(opts)
+        return wikipedia.langlinks(opts)
 
     if method == "statistics":
-        langlinks = wpapi.langlinks(opts)
-        linkshere = wpapi.linkshere(opts)
-        pageviews = wpapi.pageviews(opts)
+        langlinks = wikipedia.langlinks(opts)
+        linkshere = wikipedia.linkshere(opts)
+        pageviews = wikipedia.pageviews(opts)
 
         return {
             "langlinks" : langlinks["total"],

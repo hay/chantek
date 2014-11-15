@@ -4,7 +4,7 @@ from config import PATH
 from __init__ import __version__
 
 app = Flask(__name__)
-debug = False
+debug = False # TODO: use logging for debug
 commands = {}
 COMMANDS_PATH = PATH + "/commands"
 cache = {}
@@ -14,23 +14,33 @@ def create_app():
     parse_commands()
     return app
 
-def get_filename(path):
-    name = os.path.splitext(path)[0]
-    return os.path.basename(name)
+# TOOD: replace with logging
+def log(str):
+    if debug:
+        print(str)
 
+# This command is used to load the modules when needed
 def get_command(name):
-    return __import__("commands.%s" % name, fromlist=["commands"])
+    # For the reason why we need the fromlist argument see
+    # < http://stackoverflow.com/questions/2724260 >
+    return __import__("commands.%s.command" % name, fromlist="commands")
 
 def parse_commands():
-    for f in glob.glob(COMMANDS_PATH + "/*.py"):
-        name = get_filename(f)
+    log("Parsing commands")
 
-        if name[0] is not "_":
-            cmd = get_command(name)
-            commands[name] = name
-            if hasattr(cmd, 'aliases'):
-                for alias in cmd.aliases:
-                    commands[alias] = name
+    cmddirs = os.walk(COMMANDS_PATH).next()[1]
+
+    for cmdname in cmddirs:
+        log("Parsing <%s>" % cmdname)
+
+        command = get_command(cmdname)
+        commands[cmdname] = cmdname
+
+        if hasattr(command, "aliases"):
+            for alias in command.aliases:
+                commands[alias] = cmdname
+
+        log("Okay, loaded <%s>" % cmdname)
 
 def json_response(data):
     if 'pretty' in request.args:
@@ -155,11 +165,11 @@ def command(cmdname):
 def main():
     global debug
     parser = argparse.ArgumentParser()
-    parse_commands()
     parser.add_argument('-d', '--debug', type=bool, default=False)
-
     args = parser.parse_args()
     debug = args.debug
+
+    parse_commands()
 
     app.run(
         debug=args.debug

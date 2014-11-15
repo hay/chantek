@@ -1,4 +1,6 @@
-import util, json, time, wmcommons, math
+import util, json, time, math
+
+from commands.wmcommons import wmcommons
 
 API_ENDPOINT = "http://www.wikidata.org/w/api.php";
 

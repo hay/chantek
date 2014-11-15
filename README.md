@@ -7,14 +7,16 @@ An unaspiring HTTP API server written in Python.
 * Written by [Hay Kranen](http://github.com/hay)
 
 ## Running
-To run the server simply run `server.py` in the `app` folder. There's also a `wsgi` configuration example for production use.
+To run the server simply run `server.py` root. There's also a `wsgi` configuration example for production use.
 
 For debugging purposes try running `server.py` with the `debug=1` flag:
 
-    $ python app/server.py --debug=1
+    $ python server.py --debug=1
 
-## Writing a Chantek command
-The simplest command has a structure like this:
+## Chantek Commands
+Commands go in the `commands` folder. Every command should be in a subfolder, with at least a `__init__.py` file (this should be empty) and a `command.py` file.
+
+The simplest `command.py` file has a structure like this:
 
     def run(args):
         return "hello world"
@@ -29,7 +31,6 @@ To write a command with methods (like `command/verb`), write your command like t
         if method == "bar":
             return "Bar!"
 
-### Aliases
 A command can be known under several aliases, that do nothing more than give the same results under a different name.
 
     # hello.py
@@ -41,7 +42,6 @@ A command can be known under several aliases, that do nothing more than give the
 
     # This command can be reached under both 'hello' and 'hola'
 
-### Cacheable
 To indicate that a command is cacheable simple write a constant in your command like this:
 
     CACHEABLE = True
