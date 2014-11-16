@@ -197,6 +197,10 @@ class WikidataEntity:
         for imagevalues, entity in self.iterimages(entities):
             imagePaths.append( imagevalues["value"] )
 
+        # So, we do we actually *have* images for this entity?
+        if len(imagePaths) == 0:
+            return entities
+
         # Now get all the images
         imageinfo = wmcommons.imageinfo({
             "q" : ",".join(imagePaths),
