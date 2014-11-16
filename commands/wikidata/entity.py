@@ -125,7 +125,10 @@ class WikidataEntity:
             else:
                 url = "http://%s.wikipedia.org/wiki/%s" % (lang, title)
 
-            links[lang] = url
+            links[lang] = {
+                "title" : title,
+                "url" : url
+            }
 
         return links
 
@@ -252,6 +255,7 @@ class WikidataEntity:
             req = self.entity_request(ids_to_get)
             entities.update(req)
 
+
         for id_, entity in entities.items():
             entities[id_] = self.format(entities[id_])
 
@@ -273,7 +277,7 @@ class WikidataEntity:
         entity = self.get_entity({
             "ids" : q,
             "languages" : args["language"].split(","), # note that 'language' is not plural here
-            "props" : ("info", "labels", "descriptions", "datatype", "claims", "aliases"),
+            "props" : ("info", "labels", "descriptions", "datatype", "claims", "aliases", "sitelinks"),
             "get_references" : True,
             "flattenlanguages" : args.get("flattenlanguages") or True
         })

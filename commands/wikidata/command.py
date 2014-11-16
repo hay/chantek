@@ -12,7 +12,7 @@ def run(args, method):
 
     opts = {
         "q" : args["q"],
-        "language" : args.get("language", "en"),
+        "language" : args.get("lang", "en"),
         "from" : args.get("from", 0),
         "size" : args.get("size", 10),
         "resolveimages" : args.get("resolveimages", False),
