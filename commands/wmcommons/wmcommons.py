@@ -30,11 +30,17 @@ def imageinfo(args):
     width = args["width"]
     height = args["height"]
 
+    # FIXME: this doesn't work, because files might have a comma in the filename
+    # We need something smarter than this that isn't as ugly as the pipes in the
+    # MW api
+    """
     # Check if we have one or multiple files
     if "," not in q:
         q = [q]
     else:
         q = q.split(",")
+    """
+    q = [q]
 
     # Prefix with 'File:' if it's not there
     q = map(lambda f:f if f.startswith(FILE_PREFIX) else FILE_PREFIX + f, q)

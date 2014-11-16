@@ -68,7 +68,7 @@ def execute_command(url, params, cmd, cmdmethod, name):
     # Determine if the command is cacheable, and if so, check
     # if its in the cache
     # TODO: This truly needs some refactoring
-    if hasattr(cmd, "CACHEABLE") and cmd.CACHEABLE == True:
+    if hasattr(cmd, "CACHEABLE") and cmd.CACHEABLE == True and not debug:
         if url in cache:
             response = cache[url]
         else:
