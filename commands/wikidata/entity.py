@@ -294,3 +294,19 @@ class WikidataEntity:
             )
 
         return entity
+
+    def random(self, args):
+        r = util.apirequest(API_ENDPOINT, {
+            "languages" : "|".join(args["language"]),
+            "action" : "query",
+            "list" : "random",
+            "rnnamespace" : 0,
+            "format" : "json"
+        })
+
+        print r
+
+        if "query" in r:
+            return r["query"]["random"][0]["title"]
+        else:
+            return {"error" : "Could not get a random item"}

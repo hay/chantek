@@ -4,14 +4,11 @@ from query import WikidataQuery
 
 CACHEABLE = True
 
-methods = ("entity", "search", "query")
+methods = ("entity", "search", "query", "random")
 
 def run(args, method):
-    if "q" not in args:
-        raise Exception("No query given")
-
     opts = {
-        "q" : args["q"],
+        "q" : args.get("q", False),
         "language" : args.get("lang", "en"),
         "from" : args.get("from", 0),
         "size" : args.get("size", 10),
@@ -20,6 +17,13 @@ def run(args, method):
         "imageheight" : args.get("imageheight" , 300),
         "resolvedata" : args.get("resolvedata", False)
     }
+
+    if method == "random":
+        entity = WikidataEntity()
+        return entity.random(opts)
+
+    if "q" not in args:
+        raise Exception("No query given")
 
     if method == "entity":
         entity = WikidataEntity()
