@@ -1,13 +1,12 @@
-import requests, json
-from config import PATH
+import requests, json, logging
+from config import PATH, HTTP_TIMEOUT
 
-def apirequest(url, params, debug = False):
-    if debug:
-        print "Now getting '%s' with parameters %s" % (url, params)
+def apirequest(url, params):
+    logging.debug("Now getting '%s' with parameters %s" % (url, params))
 
-    r = requests.get(url, params = params)
-    data = r.json()
-    return data
+    r = requests.get(url, params = params, timeout = HTTP_TIMEOUT)
+
+    return r.json()
 
 def mapobj(obj, fn):
     newobj = {}

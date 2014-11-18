@@ -1,4 +1,4 @@
-import argparse, os, json, glob, time
+import argparse, os, json, glob, time, logging
 from flask import Flask, request, make_response
 from config import PATH
 from __init__ import __version__
@@ -9,15 +9,11 @@ commands = {}
 COMMANDS_PATH = PATH + "/commands"
 cache = {}
 version = __version__
+HTTP_TIMEOUT = 5
 
 def create_app():
     parse_commands()
     return app
-
-# TOOD: replace with logging
-def log(str):
-    if debug:
-        print(str)
 
 # This command is used to load the modules when needed
 def get_command(name):
@@ -26,12 +22,12 @@ def get_command(name):
     return __import__("commands.%s.command" % name, fromlist="commands")
 
 def parse_commands():
-    log("Parsing commands")
+    logging.debug("Parsing commands")
 
     cmddirs = os.walk(COMMANDS_PATH).next()[1]
 
     for cmdname in cmddirs:
-        log("Parsing <%s>" % cmdname)
+        logging.debug("Parsing <%s>" % cmdname)
 
         command = get_command(cmdname)
         commands[cmdname] = cmdname
@@ -40,7 +36,7 @@ def parse_commands():
             for alias in command.aliases:
                 commands[alias] = cmdname
 
-        log("Okay, loaded <%s>" % cmdname)
+        logging.debug("Okay, loaded <%s>" % cmdname)
 
 def json_response(data):
     if 'pretty' in request.args:
@@ -68,8 +64,11 @@ def execute_command(url, params, cmd, cmdmethod, name):
     # Determine if the command is cacheable, and if so, check
     # if its in the cache
     # TODO: This truly needs some refactoring
+    logging.debug("Executing command %s/%s" % (name, cmdmethod))
+
     if hasattr(cmd, "CACHEABLE") and cmd.CACHEABLE == True and not debug:
         if url in cache:
+            logging.debug("CACHE HIT for %s" % url)
             response = cache[url]
         else:
             if hasattr(cmd, "methods"):
@@ -140,6 +139,7 @@ def root():
 
 @app.route('/_commands')
 def list_commands():
+    logging.debug("Listing all commands")
     return json_response(commands)
 
 @app.route('/<cmdname>/<cmdmethod>')
@@ -168,6 +168,9 @@ def main():
     parser.add_argument('-d', '--debug', type=bool, default=False)
     args = parser.parse_args()
     debug = args.debug
+
+    if debug:
+        logging.basicConfig(level=logging.DEBUG)
 
     parse_commands()
 
