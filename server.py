@@ -1,13 +1,15 @@
 import argparse, os, json, glob, time, logging
+from cache import Cache
 from flask import Flask, request, make_response
 from config import PATH
 from __init__ import __version__
 
 app = Flask(__name__)
-debug = False # TODO: use logging for debug
+debug = False
+caching = True
 commands = {}
 COMMANDS_PATH = PATH + "/commands"
-cache = {}
+cache = Cache(filename="cache.json", expires = 3600)
 version = __version__
 HTTP_TIMEOUT = 5
 
@@ -66,9 +68,8 @@ def execute_command(url, params, cmd, cmdmethod, name):
     # TODO: This truly needs some refactoring
     logging.debug("Executing command %s/%s" % (name, cmdmethod))
 
-    if hasattr(cmd, "CACHEABLE") and cmd.CACHEABLE == True and not debug:
+    if hasattr(cmd, "CACHEABLE") and cmd.CACHEABLE == True and caching:
         if url in cache:
-            logging.debug("CACHE HIT for %s" % url)
             response = cache[url]
         else:
             if hasattr(cmd, "methods"):
@@ -144,33 +145,26 @@ def list_commands():
 
 @app.route('/<cmdname>/<cmdmethod>')
 def command_with_method(cmdname, cmdmethod):
-    try:
-        return run_command(cmdname, cmdmethod)
-    except:
-        if debug:
-            raise
-
-        return error("Something went wrong with this command :/")
+    return run_command(cmdname, cmdmethod)
 
 @app.route('/<cmdname>')
 def command(cmdname):
-    try:
-        return run_command(cmdname)
-    except:
-        if debug:
-            raise
-
-        return error("Something went wrong with this command :/")
+    return run_command(cmdname)
 
 def main():
-    global debug
+    global debug, caching
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--debug', type=bool, default=False)
+    parser.add_argument('-d', '--debug', action="store_true")
+    parser.add_argument('-nc', '--no-cache', action="store_true")
     args = parser.parse_args()
+
     debug = args.debug
+    caching = not args.no_cache
 
     if debug:
         logging.basicConfig(level=logging.DEBUG)
+
+    logging.debug("Cache enabled:" + str(caching))
 
     parse_commands()
 
