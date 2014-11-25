@@ -4,7 +4,7 @@ from query import WikidataQuery
 
 CACHEABLE = True
 
-methods = ("entity", "search", "query", "random")
+methods = ("entity", "search", "query", "random", "labels")
 
 def run(args, method):
     opts = {
@@ -24,6 +24,12 @@ def run(args, method):
 
     if "q" not in args:
         raise Exception("No query given")
+
+    if method == "labels":
+        ids = opts["q"].split(",")
+
+        entity = WikidataEntity()
+        return entity.labels(ids, opts["language"])
 
     if method == "entity":
         entity = WikidataEntity()
