@@ -85,6 +85,9 @@ class CommandsManager:
                 },
                 "response" : False
             })
+
+            if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
+                raise
         else:
             data_response.update({
                 "error" : False,
