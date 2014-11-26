@@ -48,8 +48,7 @@ def main():
     app.debug = config.DEBUG
 
     if config.DEBUG:
-        logging.basicConfig(level=logging.DEBUG)
-
+        logging.getLogger().setLevel(logging.DEBUG)
 
     logging.debug("Cache enabled:" + str(config.DEBUG))
 

@@ -14,6 +14,9 @@ class CommandsManager:
         # < http://stackoverflow.com/questions/2724260 >
         return __import__("commands.%s.command" % name, fromlist="commands")
 
+    def listall(self):
+        return self.commands
+
     def parse(self):
         commands = {}
 
