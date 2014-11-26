@@ -57,7 +57,7 @@ class Cache():
         now = int(time.time())
 
         if key not in self.cache:
-            logging.debug(str(key) + " not in cache")
+            logging.debug("Cache MISS for " + str(key))
             return None
 
         if (now - self.cache[key]["saved"]) > self.expires:
@@ -66,7 +66,7 @@ class Cache():
             self.cache.pop(key, None)
             return None
         else:
-            logging.debug("Cache hit for " + str(key))
+            logging.debug("Cache HIT for " + str(key))
             return self.cache[key]["value"]
 
     def __setitem__(self, key, value):
