@@ -295,6 +295,31 @@ class WikidataEntity:
 
         return entity
 
+    def labels(self, items, language):
+        # Now add a "Q" in front of the id if its not already there
+        items = map(lambda qid:qid if qid[0] == "Q" else "Q" + qid, items)
+
+        r = util.apirequest(API_ENDPOINT, {
+            "languages" : language,
+            "action" : "wbgetentities",
+            "format" : "json",
+            "props" : "labels",
+            "ids" : "|".join(items)
+        })
+
+        if "entities" in r:
+            labels = {}
+
+            for qid, data in r["entities"].iteritems():
+                if "labels" in data:
+                    labels[qid] = data["labels"][language]["value"]
+                else:
+                    labels[qid] = False
+
+            return labels
+        else:
+            return {"error" : "Could not get labels"}
+
     def random(self, args):
         r = util.apirequest(API_ENDPOINT, {
             "languages" : "|".join(args["language"]),
