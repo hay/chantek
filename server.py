@@ -58,6 +58,12 @@ def command(cmdname):
     response = run_command(cmdname)
     return json_response(response)
 
+def create_app():
+    global cache, commands
+    cache = Cache(filename="cache.json", expires = 3600)
+    commands = CommandsManager()
+    return app
+
 def main():
     global cache, commands
 
