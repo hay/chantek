@@ -54,18 +54,19 @@ def imgresize(q, lang, imgwidth):
 def article(q, lang, imgwidth):
     text = _extracts(q, lang, False)
 
-    if not text:
+    if not text or text["extract"].strip() == "":
         return False
 
     text = text["extract"]
     images = articleimages(q, lang)
-    images = imageinfo(images, lang)
 
-    # Remove all 'local' images, we can't redirect those to Commons
-    images = filter(lambda i:i["imagerepository"] == "shared", images)
+    if images:
+        images = imageinfo(images, lang)
+        # Remove all 'local' images, we can't redirect those to Commons
+        images = filter(lambda i:i["imagerepository"] == "shared", images)
 
-    for img in images:
-        img["thumb"] = imgresize(img["title"], lang, imgwidth)
+        for img in images:
+            img["thumb"] = imgresize(img["title"], lang, imgwidth)
 
     return {
         "text" : text,
@@ -96,7 +97,7 @@ def thumbnail(q, lang, imgwidth):
 
     data = _getfirstpage(data)
 
-    if not data:
+    if not data or "thumbnail" not in data:
         return False
 
     # Consistentcy, people!
@@ -123,12 +124,12 @@ def articleimages(q, lang):
 
     page = _getfirstpage(data)
 
-    if not page:
+    if not page or not "images" in page:
         return False
 
     return map(lambda x:x["title"], page["images"])
 
-def define(q, lang):
+def define(q, lang, imgwidth):
     return _extracts(q, lang, True)
 
 def suggest(q, lang):
