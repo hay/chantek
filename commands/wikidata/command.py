@@ -12,9 +12,8 @@ def run(args, method):
         "language" : args.get("lang", "en"),
         "from" : args.get("from", 0),
         "size" : args.get("size", 10),
-        "resolveimages" : args.get("resolveimages", False),
+        "resolveimages" : args.get("resolveimages", True),
         "imagewidth" : args.get("imagewidth", 300),
-        "imageheight" : args.get("imageheight" , 300),
         "resolvedata" : args.get("resolvedata", False)
     }
 

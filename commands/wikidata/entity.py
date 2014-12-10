@@ -189,32 +189,19 @@ class WikidataEntity:
                 if values["datatype"] == "commonsMedia":
                     yield values, entity
 
-    def resolve_images(self, entities, imagewidth, imageheight):
-        # First extract all the images, from the claims, get all of them
-        # in one go, and replace the claims
-        imagePaths = []
+    def resolve_images(self, entities, width):
+        allimages = []
 
         for imagevalues, entity in self.iterimages(entities):
-            imagePaths.append( imagevalues["value"] )
+            filename = imagevalues["value"]
 
-        # So, we do we actually *have* images for this entity?
-        if len(imagePaths) == 0:
-            return entities
+            image = {
+                "full" : wmcommons.imageresize(filename),
+                "thumb" : wmcommons.imageresize(filename, width)
+            }
 
-        # Now get all the images
-        imageinfo = wmcommons.imageinfo({
-            "q" : ",".join(imagePaths),
-            "width" : imagewidth,
-            "height" : imageheight
-        })
-
-        # Okay, now re-integrate these images into the entity
-        for imagevalues, entity in self.iterimages(entities):
-            imagePath = imagevalues["value"]
-
-            if imagePath in imageinfo:
-                imagevalues["image"] = imageinfo[imagePath]
-                entity["image"] = imageinfo[imagePath]
+            imagevalues["image"] = image
+            entity["image"] = image
 
         return entities
 
@@ -287,11 +274,7 @@ class WikidataEntity:
         })
 
         if args.get("resolveimages", False):
-            entity = self.resolve_images(
-                entity,
-                args["imagewidth"],
-                args["imageheight"]
-            )
+            entity = self.resolve_images(entity, args["imagewidth"])
 
         return entity
 

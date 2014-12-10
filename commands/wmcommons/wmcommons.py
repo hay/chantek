@@ -1,6 +1,7 @@
 import requests, json, re
 
 API_ENDPOINT = "http://commons.wikimedia.org/w/api.php";
+RESIZE_ENDPOINT = "http://commons.wikimedia.org/wiki/Special:Redirect/file/%s"
 FILE_PREFIX = "File:"
 
 def parse_imageinfo(data):
@@ -24,6 +25,21 @@ def request(params):
     r = requests.get(API_ENDPOINT, params = params)
     data = r.json()
     return data
+
+# Note that this method is a bit of a hack, but it's a lot cheaper
+# than getting all the JSON metadata
+def imageresize(filename, width = None):
+    # We got to remove the Namespace prefix, in all languages :/
+    if ":" in filename:
+        parts = filename.split(":")
+        filename = parts[1]
+
+    filename = RESIZE_ENDPOINT % filename
+
+    if width:
+        filename += "?width=" + str(width)
+
+    return filename
 
 def imageinfo(args):
     q = args["q"]

@@ -1,7 +1,8 @@
 import requests, json, re, time
 
+from commands.wmcommons import wmcommons
+
 API_ENDPOINT = "http://%s.wikipedia.org/w/api.php";
-RESIZE_ENDPOINT = "http://commons.wikimedia.org/wiki/Special:Redirect/file/%s?width=%s"
 
 def request(lang, params):
     url = API_ENDPOINT % lang
@@ -43,14 +44,6 @@ def _extracts(q, lang, intro = True):
 
     return page
 
-def imgresize(q, lang, imgwidth):
-    # We got to remove the Namespace prefix, in all languages :/
-    if ":" in q:
-        parts = q.split(":")
-        q = parts[1]
-
-    return RESIZE_ENDPOINT % (q, imgwidth)
-
 def article(q, lang, imgwidth):
     text = _extracts(q, lang, False)
 
@@ -66,7 +59,7 @@ def article(q, lang, imgwidth):
         images = filter(lambda i:i["imagerepository"] == "shared", images)
 
         for img in images:
-            img["thumb"] = imgresize(img["title"], lang, imgwidth)
+            img["thumb"] = wmcommons.imageresize(img["title"], imgwidth)
 
     return {
         "text" : text,
