@@ -14,10 +14,13 @@ def run(args, method):
     if "q" not in args:
         raise Exception("No query given")
 
+    lang = args.get("lang", "en")
+    q = args["q"]
+
     opts = {
-        "lang" : args.get("lang", "en"),
+        "lang" : lang,
         "imgwidth" : args.get("imgwidth", 500),
-        "q" : args["q"]
+        "q" : q
     }
 
     if method == "article":
@@ -30,21 +33,21 @@ def run(args, method):
        return wikipedia.define(**opts)
 
     if method == "suggest":
-        return wikipedia.suggest(**opts)
+        return wikipedia.suggest(q, lang)
 
     if method == "pageviews":
-        return wikipedia.pageviews(**opts)
+        return wikipedia.pageviews(q, lang)
 
     if method == "linkshere":
-        return wikipedia.linkshere(**opts)
+        return wikipedia.linkshere(q, lang)
 
     if method == "langlinks":
-        return wikipedia.langlinks(**opts)
+        return wikipedia.langlinks(q, lang)
 
     if method == "statistics":
-        langlinks = wikipedia.langlinks(**opts)
-        linkshere = wikipedia.linkshere(**opts)
-        pageviews = wikipedia.pageviews(**opts)
+        langlinks = wikipedia.langlinks(q, lang)
+        linkshere = wikipedia.linkshere(q, lang)
+        pageviews = wikipedia.pageviews(q, lang)
 
         return {
             "langlinks" : langlinks["total"],
