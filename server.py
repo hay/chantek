@@ -21,7 +21,7 @@ def json_response(data):
     return resp
 
 def run_command(name, method = None):
-    logging.debug("Executing command %s/%s" % (name, method))
+    logging.debug("Request: " + request.url)
     url = request.url
     params = request.args.to_dict()
 

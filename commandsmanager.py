@@ -1,4 +1,4 @@
-import logging, os
+import logging, os, json
 from config import PATH
 from __init__ import __version__ as version
 
@@ -44,6 +44,7 @@ class CommandsManager:
 
     def execute(self, params, cmd, cmdmethod, name):
         logging.debug("Executing command %s/%s" % (name, cmdmethod))
+        logging.debug("With params " + json.dumps(params, indent = 4))
 
         if hasattr(cmd, "methods"):
             if cmdmethod in cmd.methods:
