@@ -70,10 +70,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--debug', action="store_true")
     parser.add_argument('-nc', '--no-cache', action="store_true")
+    parser.add_argument('-t', '--timeout', type=int, default=config.HTTP_TIMEOUT)
     args = parser.parse_args()
 
     config.DEBUG = args.debug
     config.CACHING = not args.no_cache
+    config.HTTP_TIMEOUT = args.timeout
 
     app.debug = config.DEBUG
 
