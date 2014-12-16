@@ -186,7 +186,7 @@ class WikidataEntity:
             for claim in entity["claims"]:
                 values = claim["values"][0]
 
-                if "datatype" in values and ["datatype"] == "commonsMedia":
+                if "datatype" in values and values["datatype"] == "commonsMedia":
                     yield values, entity
 
     def resolve_images(self, entities, width):
