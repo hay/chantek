@@ -47,6 +47,15 @@ class CommandsManager:
         logging.debug("With params " + json.dumps(params, indent = 4))
 
         if hasattr(cmd, "methods"):
+            # Python casts tuples with one value to a string, so we
+            # need to explicitely make it a tuple
+            if isinstance(cmd.methods, str):
+                cmd.methods = (cmd.methods, )
+
+            # Check if methods is not something weird
+            if not isinstance(cmd.methods, tuple):
+                raise Exception("Methods need to be of type tuple")
+
             if cmdmethod in cmd.methods:
                 response = cmd.run(params, cmdmethod)
             else:
