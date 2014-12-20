@@ -74,8 +74,8 @@ def get_cache():
 
 def create_app():
     global cache, commands
-    commands = CommandsManager()
     cache = get_cache()
+    commands = CommandsManager()
     return app
 
 def main():
