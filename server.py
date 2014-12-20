@@ -25,7 +25,7 @@ def run_command(name, method = None):
     url = request.url
     params = request.args.to_dict()
 
-    if url in cache and config.CACHING:
+    if config.CACHING and url in cache:
         return cache[url]
 
     response = commands.run(
