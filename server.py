@@ -58,10 +58,24 @@ def command(cmdname):
     response = run_command(cmdname)
     return json_response(response)
 
+def get_cache():
+    if not config.CACHING:
+        return False
+
+    if not hasattr(config, "CACHING_TYPE"):
+        raise Exception("Caching enabled, but no caching type set")
+
+    if config.CACHING_TYPE == "memory":
+        return Cache(expires = 3600)
+    elif config.CACHING_TYPE == "file":
+        # There's a bug with the JSON caching leading to files over 5GB!
+        raise Exception("File caching is buggy at the moment")
+        # return Cache(filename="cache.json", expires = 3600)
+
 def create_app():
     global cache, commands
-    cache = Cache(filename="cache.json", expires = 3600)
     commands = CommandsManager()
+    cache = get_cache()
     return app
 
 def main():
@@ -83,8 +97,7 @@ def main():
         logging.getLogger().setLevel(logging.DEBUG)
 
     logging.debug("Cache enabled:" + str(config.CACHING))
-
-    cache = Cache(filename="cache.json", expires = 3600)
+    cache = get_cache()
 
     commands = CommandsManager()
 
