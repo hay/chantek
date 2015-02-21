@@ -81,6 +81,8 @@ def create_app():
 def main():
     global cache, commands
 
+    logging.info("Starting Chantek server")
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--debug', action="store_true")
     parser.add_argument('-nc', '--no-cache', action="store_true")
@@ -102,6 +104,8 @@ def main():
     commands = CommandsManager()
 
     app.run()
+
+    logging.info("Chantek server running")
 
 if __name__ == "__main__":
     main()

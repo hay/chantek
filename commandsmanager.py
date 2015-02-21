@@ -20,7 +20,7 @@ class CommandsManager:
     def parse(self):
         commands = {}
 
-        logging.debug("Parsing commands")
+        logging.info("Parsing commands")
 
         cmddirs = os.walk(COMMANDS_PATH).next()[1]
 
@@ -36,7 +36,7 @@ class CommandsManager:
                 for alias in command.aliases:
                     commands[alias] = cmdname
 
-            logging.debug("Okay, loaded <%s>" % cmdname)
+            logging.info("Okay, loaded <%s>" % cmdname)
 
         logging.debug("Done loading")
 
