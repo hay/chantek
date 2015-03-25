@@ -2,7 +2,7 @@ import time, logging
 
 class Cache():
     def __init__(self, expires = 600):
-        logging.debug("Enabling memory cache")
+        logging.debug("Enabling memory cache, expires %s" % expires)
         self.expires = expires
         self.cache = {}
 
