@@ -1,8 +1,11 @@
 import gtaa
 
-methods = ("findconcepts", "lookup", "lookupcombined")
+methods = ("findconcepts", "lookup", "lookupcombined", "listcombined")
 
 def run(args, method):
+    if method == "listcombined":
+        return gtaa.listcombined()
+
     if "q" not in args:
         raise Exception("No query given")
 

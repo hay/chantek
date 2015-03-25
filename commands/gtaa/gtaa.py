@@ -45,6 +45,17 @@ def lookupcombined(q, qtype):
 
     return False
 
+def listcombined():
+    csvfile = os.path.dirname(__file__) + "/combined.csv"
+    csvreader = csv.DictReader(open(csvfile))
+    rows = []
+
+    for row in csvreader:
+        row['label'] = row['label'].split(' - ')[0]
+        rows.append(row)
+
+    return rows
+
 def lookup(id_):
     url = SCHEME_ENDPOINT % id_ + ".json"
     req = requests.get(url)
