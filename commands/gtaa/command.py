@@ -1,6 +1,6 @@
 import gtaa
 
-methods = ("findconcepts", "lookup")
+methods = ("findconcepts", "lookup", "lookupcombined")
 
 def run(args, method):
     if "q" not in args:
@@ -13,3 +13,7 @@ def run(args, method):
 
     if method == "lookup":
         return gtaa.lookup(q)
+
+    if method == "lookupcombined":
+        qtype = args.get("type", "gtaa")
+        return gtaa.lookupcombined(q, qtype)

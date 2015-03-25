@@ -2,7 +2,7 @@ import time, logging, redis, json
 
 class Cache():
     def __init__(self, expires = 600):
-        logging.debug("Enabling redis cache with expire time %s" % expires)
+        logging.debug(u"Enabling redis cache with expire time %s" % expires)
         self.expires = expires
         self.cache = redis.StrictRedis(host='localhost', port=6379, db=0)
 
@@ -17,15 +17,15 @@ class Cache():
 
     def __getitem__(self, key):
         if self.cache.exists(key):
-            logging.debug("Cache HIT for %s" % key)
+            logging.debug(u"Cache HIT for %s" % key)
             val = self.cache.get(key)
             return json.loads(val)
         else:
-            logging.debug("Cache MISS for %s" % key)
+            logging.debug(u"Cache MISS for %s" % key)
             return None
 
     def __setitem__(self, key, value):
-        logging.debug("Saving %s in cache" % str(key))
+        logging.debug(u"Saving %s in cache" % key)
         value = json.dumps(value)
         self.cache.set(key, value)
 

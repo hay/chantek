@@ -1,4 +1,4 @@
-import util, requests
+import util, requests, csv, os
 
 API_ENDPOINT = "http://data.beeldengeluid.nl/api/"
 SCHEME_ENDPOINT = "http://data.beeldengeluid.nl/gtaa/%s"
@@ -31,9 +31,20 @@ def _format_concept(concept):
         "tenant" : concept.get("tenant", None)
     }
 
+def lookupcombined(q, qtype):
+    if qtype not in ("gtaa", "wikidata"):
+        raise Exception("Invalid query type")
+
+    csvfile = os.path.dirname(__file__) + "/combined.csv"
+
+    for row in csv.DictReader(open(csvfile)):
+        if row[qtype] == q:
+            return row
+
+    return False
+
 def lookup(id_):
     url = SCHEME_ENDPOINT % id_ + ".json"
-    print url
     req = requests.get(url)
 
     if req.status_code == 404:
