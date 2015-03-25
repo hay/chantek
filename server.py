@@ -1,7 +1,7 @@
 import argparse, os, json, time, logging, config
 from commandsmanager import CommandsManager
-from cache import Cache
 from flask import Flask, request, make_response
+from urlparse import urlparse
 
 app = Flask(__name__)
 cache = None
@@ -20,9 +20,17 @@ def json_response(data):
 
     return resp
 
+def get_urlpath(url):
+    parts = urlparse(url)
+
+    if parts.query is not "":
+        return "%s/?%s" % (parts.path, parts.query)
+    else:
+        return parts.path
+
 def run_command(name, method = None):
-    logging.debug("Request: " + request.url)
-    url = request.url
+    url = get_urlpath(request.url)
+    logging.debug("Request: " + url)
     params = request.args.to_dict()
 
     if config.CACHING and url in cache:
@@ -62,15 +70,9 @@ def get_cache():
     if not config.CACHING:
         return False
 
-    if not hasattr(config, "CACHING_TYPE"):
-        raise Exception("Caching enabled, but no caching type set")
+    cachemodule = __import__(config.CACHING['type'])
 
-    if config.CACHING_TYPE == "memory":
-        return Cache(expires = 3600)
-    elif config.CACHING_TYPE == "file":
-        # There's a bug with the JSON caching leading to files over 5GB!
-        raise Exception("File caching is buggy at the moment")
-        # return Cache(filename="cache.json", expires = 3600)
+    return cachemodule.Cache(expires = config.CACHING['expires'])
 
 def create_app():
     global cache, commands
@@ -90,7 +92,10 @@ def main():
     args = parser.parse_args()
 
     config.DEBUG = args.debug
-    config.CACHING = not args.no_cache
+
+    if args.no_cache:
+        config.CACHING = False
+
     config.HTTP_TIMEOUT = args.timeout
 
     app.debug = config.DEBUG
