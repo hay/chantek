@@ -10,6 +10,7 @@ SCHEMES = (
     "OnderwerpenBenG",
     "Onderwerpen",
     "Maker",
+    "Makers", # This is a hack, see the code below
     "Genre"
 )
 
@@ -20,15 +21,16 @@ def _format_concept(concept):
     id_ = concept.get("notation", [None])
 
     return {
-        "label" : hiddenLabel[0] if hiddenLabel[0] else prefLabel[0],
-        "hiddenLabel" : hiddenLabel[0],
-        "prefLabel" : prefLabel[0],
+        "label" : hiddenLabel if hiddenLabel else prefLabel,
+        "hiddenLabel" : hiddenLabel,
+        "prefLabel" : prefLabel,
         "uuid" : concept.get("uuid", None),
         "scheme" : scheme[0],
         "id" : id_[0],
         "deleted" : concept.get("deleted", None),
         "uri" : concept.get("uri", None),
-        "tenant" : concept.get("tenant", None)
+        "tenant" : concept.get("tenant", None),
+        "scopeNote" : concept.get("scopeNote", None)
     }
 
 def lookupcombined(q, qtype):
@@ -59,7 +61,13 @@ def findconcepts(q, inScheme = None):
         if not inScheme in SCHEMES:
             raise Exception("Unknown scheme")
 
-        scheme = SCHEME_ENDPOINT % inScheme
+        # Awful kludge, see below
+        if inScheme == "Makers":
+            realScheme = "Persoonsnamen"
+        else:
+            realScheme = inScheme
+
+        scheme = SCHEME_ENDPOINT % realScheme
         q += ' AND inScheme:"%s"' % scheme
 
     r = util.apirequest(endpoint, {
@@ -73,4 +81,20 @@ def findconcepts(q, inScheme = None):
     if not "docs" in r["response"] or len(r["response"]["docs"]) == 0:
         return False
 
-    return map(_format_concept, r["response"]["docs"])
+    # "Makers" has been merged with "Persoonsnamen", so we need to use this
+    # ugly kludge to get the actual maker
+    if inScheme == "Makers":
+        docs = []
+
+        for d in r["response"]["docs"]:
+            if "changeNote" not in d:
+                continue
+
+            if "Samengevoegd met: Maker" not in d["changeNote"][0]:
+                continue
+
+            docs.append(d)
+    else:
+        docs = r["response"]["docs"]
+
+    return map(_format_concept, docs)
