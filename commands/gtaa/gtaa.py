@@ -1,3 +1,4 @@
+from operator import itemgetter
 import util, requests, csv, os
 
 API_ENDPOINT = "http://data.beeldengeluid.nl/api/"
@@ -51,10 +52,17 @@ def listcombined():
     rows = []
 
     for row in csvreader:
-        row['label'] = row['label'].split(' - ')[0]
+        labels = row['label'].split(' - ')
+        row['label'] = labels[0]
+
+        try:
+            row['labelsort'] = labels[1]
+        except:
+            row['labelsort'] = ""
+
         rows.append(row)
 
-    return rows
+    return sorted(rows, key = itemgetter('labelsort'))
 
 def lookup(id_):
     url = SCHEME_ENDPOINT % id_ + ".json"
