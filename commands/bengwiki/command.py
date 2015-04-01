@@ -1,6 +1,6 @@
 import bengwiki
 
-methods = ("define")
+methods = ("define", "pagetext")
 
 def run(args, method):
     if "q" not in args:
@@ -10,3 +10,6 @@ def run(args, method):
 
     if method == "define":
         return bengwiki.define(q, expanded = args.get('expanded', False))
+
+    if method == "pagetext":
+        return bengwiki.pagetext(q)

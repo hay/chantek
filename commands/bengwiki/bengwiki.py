@@ -1,7 +1,10 @@
 import util, requests, xmltodict, urllib
+from pyquery import PyQuery as pq
+from commands.gtaa import gtaa
 
 RDF_ENDPOINT = "http://dnv-beng.mijnlieff.nl/index.php/Speciaal:RDFExporteren/%s"
 RESOLVER_ENDPOINT = "http://dnv-beng.mijnlieff.nl/index.php/Speciaal:URIResolver/"
+WIKI_ENDPOINT = "http://beeldengeluidwiki.nl/api.php"
 
 def _sanitize(string):
     string = string.replace(RESOLVER_ENDPOINT, "").replace("_", " ").replace("-", "%")
@@ -45,6 +48,55 @@ def _parse(item):
 
     return data
 
+def _lookuphref(href):
+    # This is a little ugly
+    href = href.replace("/index.php/", "")
+
+    if "action=edit" in href:
+        return False
+
+    lookup = gtaa.lookupcombined(href, "bengwiki")
+
+    if lookup:
+        return lookup["gtaa"]
+    else:
+        return False
+
+def _parsehtml(html):
+    d = pq(html)
+    d.remove(".beeldengeluid-infobox")
+
+    for a in d.find("a"):
+        pa = pq(a)
+        href = pa.attr("href")
+        href = _lookuphref(href)
+        text = pa.text()
+
+        if href:
+            pa.attr('href', href)
+        else:
+            # pa.insertAfter('<span>' + text + '</span>')
+            pa.empty().prepend("<span>" + text + "</span>")
+
+    return d.html()
+
+def pagetext(q):
+    r = util.apirequest(WIKI_ENDPOINT, {
+        "format"  : "json",
+        "action"  : "query",
+        "prop"    : "revisions",
+        "titles"  : q,
+        "rvprop"  : "content",
+        "rvparse" : 1
+    })
+
+    if "-1" in r["query"]["pages"]:
+        return False
+
+    rev = r["query"]["pages"]
+    rev = rev.itervalues().next()
+
+    return _parsehtml(rev["revisions"][0]["*"])
 
 def define(q, expanded = False):
     url = RDF_ENDPOINT % q

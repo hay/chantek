@@ -35,7 +35,7 @@ def _format_concept(concept):
     }
 
 def lookupcombined(q, qtype):
-    if qtype not in ("gtaa", "wikidata"):
+    if qtype not in ("gtaa", "wikidata", "bengwiki"):
         raise Exception("Invalid query type")
 
     csvfile = os.path.dirname(__file__) + "/combined.csv"
