@@ -183,6 +183,9 @@ class WikidataEntity:
 
     def iterimages(self, entities):
         for qid, entity in entities.iteritems():
+            if "claims" not in entity:
+                continue
+
             for claim in entity["claims"]:
                 values = claim["values"][0]
 

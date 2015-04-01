@@ -31,5 +31,3 @@ class Cache():
 
         if self.expires > 0:
             self.cache.expire(key, self.expires)
-
-        self.cache.save()
