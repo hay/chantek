@@ -65,6 +65,8 @@ def _lookuphref(href):
 def _parsehtml(html):
     d = pq(html)
     d.remove(".beeldengeluid-infobox")
+    d.remove("#personen-foto")
+    d.remove("#personen-gegevens")
 
     for a in d.find("a"):
         pa = pq(a)
@@ -77,6 +79,10 @@ def _parsehtml(html):
         else:
             # pa.insertAfter('<span>' + text + '</span>')
             pa.empty().prepend("<span>" + text + "</span>")
+
+    # Check if there is still some html left
+    if not d.html().strip():
+        return False
 
     return d.html()
 
