@@ -1,5 +1,7 @@
 import time, logging, redis, json
 
+KEY_PREFIX = "chantek:"
+
 class Cache():
     def __init__(self, expires = 600):
         logging.debug(u"Enabling redis cache with expire time %s" % expires)
@@ -13,12 +15,12 @@ class Cache():
         return self.cache.dbsize()
 
     def __contains__(self, key):
-        return self.cache.exists(key)
+        return self.cache.exists(KEY_PREFIX + key)
 
     def __getitem__(self, key):
-        if self.cache.exists(key):
+        if self.cache.exists(KEY_PREFIX + key):
             logging.debug(u"Cache HIT for %s" % key)
-            val = self.cache.get(key)
+            val = self.cache.get(KEY_PREFIX + key)
             return json.loads(val)
         else:
             logging.debug(u"Cache MISS for %s" % key)
@@ -27,7 +29,7 @@ class Cache():
     def __setitem__(self, key, value):
         logging.debug(u"Saving %s in cache" % key)
         value = json.dumps(value)
-        self.cache.set(key, value)
+        self.cache.set(KEY_PREFIX + key, value)
 
         if self.expires > 0:
-            self.cache.expire(key, self.expires)
+            self.cache.expire(KEY_PREFIX + key, self.expires)
