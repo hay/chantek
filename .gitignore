@@ -2,4 +2,3 @@
 *.log
 cache.json
 *.pyc
-etc
