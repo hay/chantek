@@ -107,6 +107,9 @@ This will save every unique URL query to an configured cache.
 ## Caching
 Currently there are two caching options: in-memory (this simply saves stuff to a dict), or [Redis](http://redis.io). Optionally, an expire timeout can be given in seconds. See the `config.py` file for instructions on how to configure your cache.
 
+# Packages you need
+    sudo pip install flask requests pyquery lxml redis xmltodict python-dateutil
+
 ## TODO
 Things that are not working yet and should be done:
 * Commands should be self-documenting, and display help in the API
