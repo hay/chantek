@@ -6,6 +6,7 @@ from urlparse import urlparse
 app = Flask(__name__)
 cache = None
 commands = None
+IGNORED_URLS = ("/favicon.ico")
 
 def json_response(data):
     if 'pretty' in request.args:
@@ -28,21 +29,31 @@ def get_urlpath(url):
     else:
         return parts.path
 
+def ignore_url(url):
+    return url in IGNORED_URLS
+
 def run_command(name, method = None):
     url = get_urlpath(request.url)
     logging.debug("Request: " + url)
+
+    if ignore_url(url):
+        return False
+
     params = request.args.to_dict()
 
     if config.CACHING and url in cache:
         return cache[url]
 
-    response = commands.run(
+    cmd, response = commands.run(
         cmdname = name,
         cmdmethod = method,
         params = params
     )
 
-    if not response["error"] and config.CACHING:
+    cacheable = hasattr(cmd, "CACHEABLE")
+    logging.debug("Command cacheable: " + str(cacheable))
+
+    if not response["error"] and config.CACHING and cacheable:
         cache[url] = response
 
     return response

@@ -1,5 +1,7 @@
 import lookup
 
+CACHEABLE = True
+
 methods = ("define", "suggest")
 
 def run(args, method):

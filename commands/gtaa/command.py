@@ -1,5 +1,7 @@
 import gtaa
 
+CACHEABLE = True
+
 methods = ("findconcepts", "lookup", "lookupcombined", "listcombined")
 
 def run(args, method):

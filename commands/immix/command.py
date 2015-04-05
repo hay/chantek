@@ -1,5 +1,7 @@
 import immix
 
+CACHEABLE = True
+
 methods = ("byperson")
 
 def run(args, method):

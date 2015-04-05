@@ -70,13 +70,13 @@ class CommandsManager:
 
     def run(self, cmdname, cmdmethod = None, params = False):
         if cmdname not in self.commands:
-            return self.error("unknown command %s" % cmdname)
+            return False, self.error("unknown command %s" % cmdname)
 
         name = self.commands[cmdname]
         cmd = self.get(name)
 
         if cmdmethod and not hasattr(cmd, 'methods'):
-            return self.error("<%s> does not have any methods" % name)
+            return False, self.error("<%s> does not have any methods" % name)
 
         data_response = {
             "chantek" : version,
@@ -107,4 +107,4 @@ class CommandsManager:
                 "response" : response
             })
 
-        return data_response
+        return cmd, data_response

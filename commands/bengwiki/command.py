@@ -1,5 +1,7 @@
 import bengwiki
 
+CACHEABLE = True
+
 methods = ("define", "pagetext")
 
 def run(args, method):

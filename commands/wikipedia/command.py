@@ -1,5 +1,7 @@
 import wikipedia
 
+CACHEABLE = True
+
 methods = (
     "article",
     "define",
