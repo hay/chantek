@@ -56,7 +56,7 @@ def article(q, lang, imgwidth):
     if images:
         images = imageinfo(images, lang)
         # Remove all 'local' images, we can't redirect those to Commons
-        images = filter(lambda i:i["imagerepository"] == "shared", images)
+        images = [ i for i in images if isinstance(i, dict) and i.get("imagerepository", None) ]
 
         for img in images:
             img["thumb"] = wmcommons.imageresize(img["title"], imgwidth)

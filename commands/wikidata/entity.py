@@ -190,12 +190,10 @@ class WikidataEntity:
                 values = claim["values"][0]
 
                 if "datatype" in values and values["datatype"] == "commonsMedia":
-                    yield values, entity
+                    yield values, entity, claim["property_id"]
 
     def resolve_images(self, entities, width):
-        allimages = []
-
-        for imagevalues, entity in self.iterimages(entities):
+        for imagevalues, entity, property_id in self.iterimages(entities):
             filename = imagevalues["value"]
 
             image = {
@@ -204,7 +202,9 @@ class WikidataEntity:
             }
 
             imagevalues["image"] = image
-            entity["image"] = image
+
+            if property_id == "P18":
+                entity["image"] = image
 
         return entities
 
