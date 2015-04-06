@@ -1,6 +1,6 @@
 import time, logging, redis, json
 
-KEY_PREFIX = "chantek:"
+KEY_PREFIX = "chantek:cache:"
 
 class Cache():
     def __init__(self, expires = 600):
