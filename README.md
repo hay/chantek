@@ -1,21 +1,33 @@
 Chantek
 =======
-An unaspiring HTTP API server written in Python.
+An unaspiring read-only HTTP API server written in Python.
+
 Easily extended with your own commands.
+
 Includes default commands for querying Wikipedia, Wikidata and the Magic 8-Ball.
 
-Try the live demo: http://chantek.bykr.org
+Try the live demo: [http://api.haykranen.nl](http://api.haykranen.nl)
 
 ## Reference
 * [Source on Github](http://github.com/hay/chantek)
 * Written by [Hay Kranen](http://github.com/hay)
 
-## Running
+## Running (production)
 To run the server simply run `server.py` in the root. There's also a `uwsgi.ini` configuration example for [production use](http://www.haykranen.nl/2014/11/15/running-a-python-flask-app-with-nginx-using-uwsgi/).
+
+Another option is simply running this with an init script (see `etc/ubuntu-init.conf` for an example), and proxy the calls using something like Nginx. See `etc/nginx-example.conf` for an example.
+
+## Running (development)
 
 For debugging purposes try running `server.py` with the `debug=1` flag:
 
     $ python server.py --debug=1
+
+Or simply use `-d`
+
+    $ python server.py -d
+
+To disable caching use the `-nc` flag.
 
 This will run your Chantek server on port 5000.
 
@@ -108,6 +120,8 @@ This will save every unique URL query to an configured cache.
 Currently there are two caching options: in-memory (this simply saves stuff to a dict), or [Redis](http://redis.io). Optionally, an expire timeout can be given in seconds. See the `config.py` file for instructions on how to configure your cache.
 
 # Packages you need
+I should probably make a `requirements.txt` file sometime, for now run this:
+
     sudo pip install flask requests pyquery lxml redis xmltodict python-dateutil
 
 ## TODO
