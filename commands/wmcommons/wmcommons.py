@@ -67,7 +67,7 @@ def imageinfo(args):
         "prop" : "imageinfo",
         "iiurlwidth" : width,
         "iiurlheight" : height,
-        "iiprop" : "url|size"
+        "iiprop" : "url|size|extmetadata"
     })
 
     imageinfo = parse_imageinfo(data)
