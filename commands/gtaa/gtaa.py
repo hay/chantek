@@ -1,5 +1,6 @@
 from operator import itemgetter
-import util, requests, csv, os
+import util, requests, os
+import unicodecsv as csv
 
 API_ENDPOINT = "http://data.beeldengeluid.nl/api/"
 SCHEME_ENDPOINT = "http://data.beeldengeluid.nl/gtaa/%s"
@@ -34,17 +35,27 @@ def _format_concept(concept):
         "scopeNote" : concept.get("scopeNote", None)
     }
 
+def _combined_iterator():
+    csvpath = os.path.dirname(__file__) + "/combined.csv"
+    csvfile = open(csvpath)
+
+    for row in csv.DictReader(csvfile):
+        yield row
+
+    csvfile.close()
+
 def lookupcombined(q, qtype):
     if qtype not in ("gtaa", "wikidata", "bengwiki"):
         raise Exception("Invalid query type")
 
-    csvfile = os.path.dirname(__file__) + "/combined.csv"
-
-    for row in csv.DictReader(open(csvfile)):
+    for row in _combined_iterator():
         if row[qtype] == q:
             return row
 
     return False
+
+def finditems(q, limit):
+    return [r for r in _combined_iterator() if q.lower() in r["lookup"].lower() ][0:limit]
 
 def listcombined():
     csvfile = os.path.dirname(__file__) + "/combined.csv"
@@ -72,48 +83,3 @@ def lookup(id_):
         return False
 
     return _format_concept(req.json())
-
-def findconcepts(q, inScheme = None):
-    endpoint = API_ENDPOINT + "find-concepts"
-
-    if inScheme:
-        if not inScheme in SCHEMES:
-            raise Exception("Unknown scheme")
-
-        # Awful kludge, see below
-        if inScheme == "Makers":
-            realScheme = "Persoonsnamen"
-        else:
-            realScheme = inScheme
-
-        scheme = SCHEME_ENDPOINT % realScheme
-        q += ' AND inScheme:"%s"' % scheme
-
-    r = util.apirequest(endpoint, {
-        "q" : q,
-        "format" : "json"
-    })
-
-    if not "response" in r:
-        return False
-
-    if not "docs" in r["response"] or len(r["response"]["docs"]) == 0:
-        return False
-
-    # "Makers" has been merged with "Persoonsnamen", so we need to use this
-    # ugly kludge to get the actual maker
-    if inScheme == "Makers":
-        docs = []
-
-        for d in r["response"]["docs"]:
-            if "changeNote" not in d:
-                continue
-
-            if "Samengevoegd met: Maker" not in d["changeNote"][0]:
-                continue
-
-            docs.append(d)
-    else:
-        docs = r["response"]["docs"]
-
-    return map(_format_concept, docs)

@@ -2,7 +2,7 @@ import gtaa
 
 CACHEABLE = True
 
-methods = ("findconcepts", "lookup", "lookupcombined", "listcombined")
+methods = ("finditems", "lookup", "lookupcombined", "listcombined")
 
 def run(args, method):
     if method == "listcombined":
@@ -12,9 +12,10 @@ def run(args, method):
         raise Exception("No query given")
 
     q = args["q"]
+    limit = args.get("limit", 10)
 
-    if method == "findconcepts":
-        return gtaa.findconcepts(q, inScheme = args.get("scheme", None))
+    if method == "finditems":
+        return gtaa.finditems(q, limit)
 
     if method == "lookup":
         return gtaa.lookup(q)
