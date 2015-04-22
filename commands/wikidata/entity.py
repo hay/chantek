@@ -35,6 +35,48 @@ class WikidataEntity:
 
         return val
 
+    def get_claimvaluestring(self, val):
+        datatype = val["datatype"]
+
+        value = val.get("value", False)
+
+        if not value:
+            return ""
+
+        if datatype == "wikibase-item":
+            return val.get("value_labels", "")
+
+        if datatype in ["string", "monolingualtext", "url"]:
+            return value
+
+        if datatype == "time":
+            # HACK: This is really, pretty ugly
+            # See < https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar >
+            return value["time"][1:].lstrip("0")
+
+        if datatype == "commonsMedia":
+            return wmcommons.imagepage(value)
+
+        if datatype == "globe-coordinate":
+            return "%s,%s" % (value["latitude"], value["longitude"])
+
+        if datatype == "quantity":
+            return str(float(value.get("amount", "")))
+
+        return ""
+
+    def add_claimvaluestrings(self, claims):
+        """ This basically does nothing more than adding a string-safe representation
+        of every claim value"""
+        for claim in claims:
+            if "values" not in claim:
+                continue
+
+            for val in claim["values"]:
+                val["value_string"] = self.get_claimvaluestring(val)
+
+        return claims
+
     def get_claims(self, clist):
         """
         This is a two-set process, because we don't know the labels of the
@@ -101,6 +143,8 @@ class WikidataEntity:
 
         # Sort by property ID, usually the lower numbers are more imporant
         claims.sort(key = lambda c:int(c['property_id'][1:]))
+
+        claims = self.add_claimvaluestrings(claims)
 
         return claims
 
@@ -214,6 +258,7 @@ class WikidataEntity:
             "action" : "wbgetentities",
             "ids" : "|".join(ids),
             "props" : "|".join(self.props),
+            "languagefallback" : 1,
             "format" : "json"
         })
 
@@ -290,6 +335,7 @@ class WikidataEntity:
             "action" : "wbgetentities",
             "format" : "json",
             "props" : "labels",
+            "languagefallback" : 1,
             "ids" : "|".join(items)
         })
 
@@ -312,6 +358,7 @@ class WikidataEntity:
             "action" : "query",
             "list" : "random",
             "rnnamespace" : 0,
+            "languagefallback" : 1,
             "format" : "json"
         })
 

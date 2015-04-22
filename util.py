@@ -27,6 +27,8 @@ def load_datafile(filename):
 # This variable replacement stuff is pretty ugly here, because of the
 # variable number of arguments, but i don't really know how to do this
 # otherwise
-def sprintf (string, args):
+def sprintf(string, args):
     return string % args[:string.count("%s")]
 
+def dump(val):
+    print json.dumps(val, indent = 4)

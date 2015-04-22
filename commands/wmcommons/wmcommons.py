@@ -1,7 +1,9 @@
 import requests, json, re
 
-API_ENDPOINT = "http://commons.wikimedia.org/w/api.php";
-RESIZE_ENDPOINT = "http://commons.wikimedia.org/wiki/Special:Redirect/file/%s"
+COMMONS_ENDPOINT = "http://commons.wikimedia.org"
+PAGE_ENDPOINT = COMMONS_ENDPOINT + "/wiki/File:%s"
+API_ENDPOINT = COMMONS_ENDPOINT + "/w/api.php";
+RESIZE_ENDPOINT = COMMONS_ENDPOINT + "/wiki/Special:Redirect/file/%s"
 FILE_PREFIX = "File:"
 
 def parse_imageinfo(data):
@@ -25,6 +27,9 @@ def request(params):
     r = requests.get(API_ENDPOINT, params = params)
     data = r.json()
     return data
+
+def imagepage(filename):
+    return PAGE_ENDPOINT % filename
 
 # Note that this method is a bit of a hack, but it's a lot cheaper
 # than getting all the JSON metadata
