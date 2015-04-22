@@ -27,7 +27,7 @@ def run(args, method):
 
     if method == "linkshere":
         links = WikidataLinkshere(opts)
-        return links.linkshere(opts["q"])
+        return links.linkshere(opts)
 
     if method == "labels":
         ids = opts["q"].split(",")

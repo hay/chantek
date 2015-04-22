@@ -1,3 +1,4 @@
+from entity import WikidataEntity
 import util, json
 
 API_ENDPOINT = "http://www.wikidata.org/w/api.php";
@@ -5,20 +6,6 @@ API_ENDPOINT = "http://www.wikidata.org/w/api.php";
 class WikidataLinkshere:
     def __init__(self, params):
         self.params = params
-
-    # Should probably be deployed to entity.py
-    def _entities(self, ids):
-        opts = {
-            "action"           : "wbgetentities",
-            "ids"              : "|".join(ids),
-            "languages"        : self.params["language"],
-            "format"           : "json",
-            "languagefallback" : 1
-        }
-
-        r = util.apirequest(API_ENDPOINT, opts)
-
-        return r
 
     def _linkshere(self, q):
         r = util.apirequest(API_ENDPOINT, {
@@ -34,14 +21,23 @@ class WikidataLinkshere:
         if "-1" in r["query"]["pages"]:
             return False
 
-        links = r["query"]["pages"].itervalues().next()["linkshere"]
+        links = r["query"]["pages"].itervalues().next().get("linkshere", None)
 
-        return [ i["title"] for i in links ]
+        if links:
+            return [ i["title"] for i in links ]
+        else:
+            return False
 
-    def linkshere(self, q):
-        results = self._linkshere(q)
+    def linkshere(self, opts):
+        results = self._linkshere(opts["q"])
 
-        if not self.params["resolvedata"]:
+        if self.params["resolvedata"]:
+            entity = WikidataEntity()
+            opts["q"] = ",".join(results)
+
+            if self.params["resolvedata"] == "minimal":
+                opts["props"] = ("labels", "descriptions")
+
+            return entity.entity(opts)
+        else:
             return results
-
-        return self._entities(results)

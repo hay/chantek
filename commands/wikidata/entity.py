@@ -3,6 +3,7 @@ import util, json, time, math
 from commands.wmcommons import wmcommons
 
 API_ENDPOINT = "http://www.wikidata.org/w/api.php";
+DEFAULT_PROPS = ("info", "labels", "descriptions", "datatype", "claims", "aliases", "sitelinks")
 
 class WikidataEntity:
     def __init__(self):
@@ -304,19 +305,15 @@ class WikidataEntity:
         # Parse the query
         q = args["q"]
 
-        # Check if we have one or multiple entity ID
-        if "," in q:
-            q = q.split(",")
-        else:
-            q = [q]
+        # Convert to a list, prepended with a q if needed
+        q = [ qid if qid[0] == "Q" else "Q" + qid for qid in q.split(",") ]
 
-        # Now add a "Q" in front of the id if its not already there
-        q = map(lambda qid:qid if qid[0] == "Q" else "Q" + qid, q)
+        props = args.get("props", DEFAULT_PROPS)
 
         entity = self.get_entity({
             "ids" : q,
             "languages" : args["language"].split(","), # note that 'language' is not plural here
-            "props" : ("info", "labels", "descriptions", "datatype", "claims", "aliases", "sitelinks"),
+            "props" : props,
             "get_references" : True,
             "flattenlanguages" : args.get("flattenlanguages") or True
         })
@@ -328,7 +325,7 @@ class WikidataEntity:
 
     def labels(self, items, language):
         # Now add a "Q" in front of the id if its not already there
-        items = map(lambda qid:qid if qid[0] == "Q" else "Q" + qid, items)
+        items = [ qid if qid[0] == "Q" else "Q" + id for qid in items]
 
         r = util.apirequest(API_ENDPOINT, {
             "languages" : language,
