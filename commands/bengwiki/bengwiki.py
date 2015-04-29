@@ -64,9 +64,13 @@ def _lookuphref(href):
 
 def _parsehtml(html):
     d = pq(html)
-    d.remove(".beeldengeluid-infobox")
-    d.remove("#personen-foto")
-    d.remove("#personen-gegevens")
+
+    [d.remove(selector) for selector in (
+        ".beeldengeluid-infobox",
+        "#personen-foto",
+        "#personen-gegevens",
+        ".mw-editsection"
+    )]
 
     for a in d.find("a"):
         pa = pq(a)
@@ -77,14 +81,13 @@ def _parsehtml(html):
         if href:
             pa.attr('href', href)
         else:
-            # pa.insertAfter('<span>' + text + '</span>')
             pa.empty().prepend("<span>" + text + "</span>")
 
     # Check if there is still some html left
     if not d.html().strip():
         return False
 
-    return d.html()
+    return d.html().strip()
 
 def pagetext(q):
     r = util.apirequest(WIKI_ENDPOINT, {
