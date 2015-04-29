@@ -2,11 +2,13 @@ import immix
 
 CACHEABLE = True
 
-methods = ("byperson")
+methods = ("imagesforperson")
 
 def run(args, method):
-    if "gtaa" not in args:
+    if "q" not in args:
         raise Exception("No query given")
 
-    if method == "byperson":
-        return immix.byperson(args['gtaa'])
+    q = args.get("q")
+
+    if method == "imagesforperson":
+        return immix.imagesforperson(q)

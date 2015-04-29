@@ -1,50 +1,22 @@
-import requests, json, copy
+import requests, json, copy, random
 
-GTAA_ENDPOINT = "http://data.beeldengeluid.nl/gtaa/%s.json"
-# IMMIX_ENDPOINT = "http://in.beeldengeluid.nl/collectie/api/search"
-IMMIX_ENDPOINT = "http://labs.beeldengeluid.nl/mm/mm-basic/search"
+IMMIX_ENDPOINT = "http://in.beeldengeluid.nl/collectie/api/search"
+MEDIA_ENDPOINT = "http://in.beeldengeluid.nl/collectie/%s"
 
-"""
 IMMIX_PAYLOAD = {
-    "phrase": "",
-    "page": "1",
-    "numkeyframes": "1",
-    "sorting": "SORT-DEF",
-    "mediaType": "ALL_MEDIA",
+    "numkeyframes": 1,
+    "page" : 1,
+    "mediaType": "IMAGE",
     "pagesize": 12,
-    "startdate": "",
-    "enddate": "",
     "publiclyViewableResultsOnly": "true",
-    "digitalViewableResultsOnly": None,
-    "termFilters": {}
-}
-"""
-
-IMMIX_PAYLOAD = {
-    "zoekVraag": "*",
-    "zoekInOndertitels": False,
-    "pagina": 1,
-    "paginaGrootte": 10,
-    "sort": "TITLE_ASC",
-    "facetFilters": [],
-    "specificFields": [],
-    "transcriptFields": []
+    "termFilters": {
+        "Persoonsnamen": []
+    }
 }
 
-def byperson(gtaa):
-    gtaaurl = GTAA_ENDPOINT % gtaa
-    r = requests.get(gtaaurl)
-    prefLabel = r.json()['prefLabel'][0]
-
+def imagesforperson(name):
     payload = copy.deepcopy(IMMIX_PAYLOAD)
-    # payload['termFilters']["Persoonsnamen"] = [ prefLabel ]
-
-    payload['specificFields'].append({
-        "operator": "and",
-        "field": "personen",
-        "value": prefLabel
-    })
-
+    payload["termFilters"]["Persoonsnamen"].append(name)
 
     headers = {
         'Content-Type' : 'application/json;charset=UTF-8',
@@ -53,4 +25,23 @@ def byperson(gtaa):
 
     r = requests.post(IMMIX_ENDPOINT, data = json.dumps(payload), headers = headers)
 
-    return r.json().get("searchResults", None)
+    items = r.json().get("responseItems", None)
+
+    if not items:
+        return None
+
+    images = []
+
+    # Nesting, baby!
+    for hit in items:
+        for positie in hit["posities"]:
+            images.append({
+                "label" : hit["mainTitle"],
+                "expressie" : hit["expressie"]["id"],
+                "thumb" : MEDIA_ENDPOINT % positie["thumbnailUri"].replace("./", ""),
+                "image" : MEDIA_ENDPOINT % positie["consultancyCopyUri"].replace("./", "")
+            })
+
+    # A completely unscientific way to get 12 random images
+    random.shuffle(images)
+    return images[:12]
