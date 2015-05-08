@@ -44,13 +44,20 @@ def _extracts(q, lang, intro = True):
 
     return page
 
-def article(q, lang, imgwidth):
-    text = _extracts(q, lang, False)
+def _article(q, lang):
+    opts = {
+        "action" : "query",
+        "prop" : "revisions",
+        "titles" : q,
+        "rvprop" : "content",
+        "rvparse" : 1
+    }
 
-    if not text or text["extract"].strip() == "":
-        return False
+    data = request(lang, opts)
+    text = _getfirstpage(data)["revisions"][0]["*"]
+    return text
 
-    text = text["extract"]
+def _getimages(q, lang, imgwidth):
     images = articleimages(q, lang)
 
     if images:
@@ -60,11 +67,32 @@ def article(q, lang, imgwidth):
 
         for img in images:
             img["thumb"] = wmcommons.imageresize(img["title"], imgwidth)
+    else:
+        return None
+
+    return images
+
+def article(q, lang, imgwidth):
+    text = _article(q, lang)
 
     return {
         "text" : text,
         "thumbnail" : thumbnail(q, lang, imgwidth),
-        "images" : images
+        "images" : _getimages(q, lang, imgwidth)
+    }
+
+def extracts(q, lang, imgwidth):
+    text = _extracts(q, lang, False)
+
+    if not text or text["extract"].strip() == "":
+        return False
+
+    text = text["extract"]
+
+    return {
+        "text" : text,
+        "thumbnail" : thumbnail(q, lang, imgwidth),
+        "images" : _getimages(q, lang, imgwidth)
     }
 
 def _imageinfo_format(img):

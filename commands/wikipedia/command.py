@@ -4,6 +4,7 @@ CACHEABLE = True
 
 methods = (
     "article",
+    "extracts",
     "define",
     "suggest",
     "pageviews",
@@ -27,6 +28,9 @@ def run(args, method):
 
     if method == "article":
         return wikipedia.article(**opts)
+
+    if method == "extracts":
+        return wikipedia.extracts(**opts)
 
     if method == "imgresize":
         return wikipedia.imgresize(**opts)
