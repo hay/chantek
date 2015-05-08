@@ -31,6 +31,9 @@ class WikidataLinkshere:
     def linkshere(self, opts):
         results = self._linkshere(opts["q"])
 
+        if not results:
+            return False
+
         if self.params["resolvedata"]:
             entity = WikidataEntity()
             opts["q"] = ",".join(results)
