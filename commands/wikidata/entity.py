@@ -37,11 +37,10 @@ class WikidataEntity:
         return val
 
     def get_claimvaluestring(self, val):
-        datatype = val["datatype"]
-
+        datatype = val.get("datatype", None)
         value = val.get("value", False)
 
-        if not value:
+        if not value or not datatype:
             return ""
 
         if datatype == "wikibase-item":
