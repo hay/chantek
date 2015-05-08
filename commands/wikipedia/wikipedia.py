@@ -98,8 +98,11 @@ def _cleanup(html):
     d.find("#Externe_link").remove()
 
     for a in d.find("a[href]"):
-        pa = pq(a)
-        pa.removeAttr('href')
+        pq(a).removeAttr('href')
+
+    # Stupid inline styles
+    for el in d.find("[style]"):
+        pq(el).removeAttr('style')
 
     text = d.html().strip()
     return text if text else False
