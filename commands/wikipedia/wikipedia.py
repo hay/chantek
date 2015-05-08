@@ -1,5 +1,5 @@
 import requests, json, re, time
-
+from pyquery import PyQuery as pq
 from commands.wmcommons import wmcommons
 
 API_ENDPOINT = "http://%s.wikipedia.org/w/api.php";
@@ -55,6 +55,7 @@ def _article(q, lang):
 
     data = request(lang, opts)
     text = _getfirstpage(data)["revisions"][0]["*"]
+
     return text
 
 def _getimages(q, lang, imgwidth):
@@ -72,8 +73,42 @@ def _getimages(q, lang, imgwidth):
 
     return images
 
-def article(q, lang, imgwidth):
+selectors_to_remove = (
+    ".infobox",
+    ".reference",
+    ".toc",
+    ".mw-editsection",
+    ".thumb",
+    ".image",
+    ".toccolours",
+    ".noprint",
+    ".credits",
+    ".navigatiesjabloon"
+)
+
+def _cleanup(html):
+    d = pq(html)
+
+    [d.remove(s) for s in selectors_to_remove]
+    d.find(".references").parent().remove()
+    d.find("#Externe_links").parent().next().remove()
+    d.find("#Externe_link").parent().next().remove()
+    d.find("#Referenties").remove()
+    d.find("#Externe_links").remove()
+    d.find("#Externe_link").remove()
+
+    for a in d.find("a[href]"):
+        pa = pq(a)
+        pa.removeAttr('href')
+
+    text = d.html().strip()
+    return text if text else False
+
+def article(q, lang, imgwidth, cleanup):
     text = _article(q, lang)
+
+    if cleanup:
+        text = _cleanup(text)
 
     return {
         "text" : text,
@@ -183,6 +218,32 @@ def pageviews(q, lang):
     stats["total"] = total
 
     return stats
+
+def _formatlink(link):
+    if "pageprops" in link:
+        link["wikidata"] = link["pageprops"].get("wikibase_item", None)
+        link["image"] = link["pageprops"].get("page_image", None)
+        link.pop("pageprops", None)
+
+    return link
+
+# Returns all internal links in a page, with a Wikidata ID and page image
+def links(q, lang):
+    data = request(lang, {
+        "action" : "query",
+        "prop" : "pageprops",
+        "redirects" : 1,
+        "titles" : q,
+        "generator" : "links",
+        "titles" : q,
+        "gplnamespace" : 0,
+        "gpllimit" : 500
+    })
+
+    if not data:
+        return False
+
+    return map(_formatlink, data["query"]["pages"].values())
 
 def linkshere(q, lang):
     data = request(lang, {

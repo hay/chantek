@@ -10,7 +10,8 @@ methods = (
     "pageviews",
     "linkshere",
     "langlinks",
-    "statistics"
+    "statistics",
+    "links"
 )
 
 def run(args, method):
@@ -23,7 +24,8 @@ def run(args, method):
     opts = {
         "lang" : lang,
         "imgwidth" : args.get("imgwidth", 500),
-        "q" : q
+        "q" : q,
+        "cleanup" : args.get("cleanup", None)
     }
 
     if method == "article":
@@ -37,6 +39,9 @@ def run(args, method):
 
     if method == "define":
        return wikipedia.define(**opts)
+
+    if method == "links":
+        return wikipedia.links(q, lang)
 
     if method == "suggest":
         return wikipedia.suggest(q, lang)
