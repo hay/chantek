@@ -6,4 +6,9 @@ CACHING = {
     "type" : "rediscache", # 'memorycache', 'rediscache'
     "expires" : 3600
 }
+REDIS = {
+    "host" : "localhost",
+    "port" : 6379,
+    "db" : 0
+}
 # logging.basicConfig(filename = 'chantek.log', level = logging.INFO)

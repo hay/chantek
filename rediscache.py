@@ -1,4 +1,4 @@
-import time, logging, redis, json
+import time, logging, redis, json, config, json
 
 KEY_PREFIX = "chantek:cache:"
 
@@ -6,7 +6,13 @@ class Cache():
     def __init__(self, expires = 600):
         logging.debug(u"Enabling redis cache with expire time %s" % expires)
         self.expires = expires
-        self.cache = redis.StrictRedis(host='localhost', port=6379, db=0)
+        conf = config.REDIS
+        logging.debug(u"Redis cache has these parameters: " + json.dumps(conf))
+        self.cache = redis.StrictRedis(
+            host = conf["host"],
+            port = conf["port"],
+            db = conf["db"]
+        )
 
     def keys(self):
         return self.cache.keys()
