@@ -119,7 +119,7 @@ def main():
 
     commands = CommandsManager()
 
-    app.run(port = config.PORT)
+    app.run(port = config.PORT, host = config.HOST)
 
     logging.info("Chantek server running")
 

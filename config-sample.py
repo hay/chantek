@@ -12,4 +12,5 @@ REDIS = {
     "db" : 0
 }
 PORT = 5000
+HOST = 'localhost'
 # logging.basicConfig(filename = 'chantek.log', level = logging.INFO)
