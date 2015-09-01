@@ -116,6 +116,11 @@ To indicate that a command is cacheable simple write a constant in your command 
 
 This will save every unique URL query to an configured cache.
 
+You can make only some methods cacheable, to do so, simply use a tuple instead of a bool
+
+    methods = ("search", "random")
+    CACHEABLE = ("search") # 'random' should not be cacheable
+
 ## Caching
 Currently there are two caching options: in-memory (this simply saves stuff to a dict), or [Redis](http://redis.io). Optionally, an expire timeout can be given in seconds. See the `config.py` file for instructions on how to configure your cache.
 
