@@ -348,7 +348,7 @@ class WikidataEntity:
         else:
             return {"error" : "Could not get labels"}
 
-    def random(self, args):
+    def _get_random_qid(self, args):
         r = util.apirequest(API_ENDPOINT, {
             "languages" : "|".join(args["language"]),
             "action" : "query",
@@ -361,10 +361,25 @@ class WikidataEntity:
         if "query" not in r:
             return {"error" : "Could not get a random item"}
 
-        qid = r["query"]["random"][0]["title"]
+        return r["query"]["random"][0]["title"]
 
-        if args.get("resolvedata", False):
-            args["q"] = qid
-            return self.entity(args)
-        else:
-            return qid
+    def _get_random_entity(self, args):
+        args["q"] = self._get_random_qid(args)
+        return self.entity(args)
+
+    def random(self, args):
+        if not args["resolvedata"]:
+            return self._get_random_qid(args)
+
+        if args["optionalclaims"] == True:
+            return self._get_random_entity(args)
+
+        # Loop until we get an item that has claims
+        while True:
+            entity = self._get_random_entity(args)
+            data = entity[entity.keys()[0]]
+
+            if "claims" in data:
+                break
+
+        return entity

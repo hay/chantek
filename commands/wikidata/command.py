@@ -8,13 +8,14 @@ CACHEABLE = ("entity", "search", "query", "labels", "linkshere") # 'Random' is n
 
 def run(args, method):
     opts = {
-        "q"             : args.get("q", False),
-        "language"      : args.get("lang", "en"),
-        "from"          : args.get("from", 0),
-        "size"          : args.get("size", 10),
-        "resolveimages" : args.get("resolveimages", True),
-        "imagewidth"    : args.get("imagewidth", 300),
-        "resolvedata"   : args.get("resolvedata", False)
+        "q"              : args.get("q", False),
+        "language"       : args.get("lang", "en"),
+        "from"           : args.get("from", 0),
+        "size"           : args.get("size", 10),
+        "resolveimages"  : args.get("resolveimages", True),
+        "imagewidth"     : args.get("imagewidth", 300),
+        "resolvedata"    : args.get("resolvedata", False),
+        "optionalclaims" : args.get("optionalclaims", True) # Should the item have claims? Only useful for the 'random' method really
     }
 
     if method == "random":
