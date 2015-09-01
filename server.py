@@ -54,7 +54,13 @@ def run_command(name, method = None):
     logging.debug("Command cacheable: " + str(cacheable))
 
     if not response["error"] and config.CACHING and cacheable:
-        cache[url] = response
+        # We also need to check if this cache is only for specific methods
+        if isinstance(cmd.CACHEABLE, tuple):
+            if method in cmd.CACHEABLE:
+                cache[url] = response
+        else:
+            # Not specific, simply cache this
+            cache[url] = response
 
     return response
 

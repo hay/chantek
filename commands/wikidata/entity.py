@@ -358,9 +358,13 @@ class WikidataEntity:
             "format" : "json"
         })
 
-        print r
-
-        if "query" in r:
-            return r["query"]["random"][0]["title"]
-        else:
+        if "query" not in r:
             return {"error" : "Could not get a random item"}
+
+        qid = r["query"]["random"][0]["title"]
+
+        if args.get("resolvedata", False):
+            args["q"] = qid
+            return self.entity(args)
+        else:
+            return qid

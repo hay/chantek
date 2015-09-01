@@ -3,9 +3,8 @@ from search import WikidataSearch
 from query import WikidataQuery
 from linkshere import WikidataLinkshere
 
-CACHEABLE = True
-
 methods = ("entity", "search", "query", "random", "labels", "linkshere")
+CACHEABLE = ("entity", "search", "query", "labels", "linkshere") # 'Random' is not cacheable
 
 def run(args, method):
     opts = {
