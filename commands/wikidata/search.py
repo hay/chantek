@@ -1,6 +1,6 @@
 import util, json
 
-API_ENDPOINT = "http://www.wikidata.org/w/api.php";
+API_ENDPOINT = "https://www.wikidata.org/w/api.php";
 
 class WikidataSearch:
     def __init__(self):

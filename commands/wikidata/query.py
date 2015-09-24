@@ -1,7 +1,7 @@
 import util, json
 from entity import WikidataEntity
 
-API_ENDPOINT = "http://wdq.wmflabs.org/api";
+API_ENDPOINT = "https://wdq.wmflabs.org/api";
 
 class WikidataQuery:
     def __init__(self):

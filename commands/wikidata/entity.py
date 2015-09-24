@@ -2,7 +2,7 @@ import util, json, time, math
 
 from commands.wmcommons import wmcommons
 
-API_ENDPOINT = "http://www.wikidata.org/w/api.php";
+API_ENDPOINT = "https://www.wikidata.org/w/api.php";
 DEFAULT_PROPS = ("info", "labels", "descriptions", "datatype", "claims", "aliases", "sitelinks")
 
 class WikidataEntity:
@@ -181,7 +181,7 @@ class WikidataEntity:
 
         for key in ("descriptions", "labels", "aliases"):
             if key in item:
-                item[key] = item[key][lang]
+                item[key] = item[key].get(lang, None)
 
         if "claims" not in item:
             return item
