@@ -106,12 +106,21 @@ def main():
     parser.add_argument('-d', '--debug', action="store_true")
     parser.add_argument('-nc', '--no-cache', action="store_true")
     parser.add_argument('-t', '--timeout', type=int, default=config.HTTP_TIMEOUT)
+    parser.add_argument(
+        '-c',
+        '--cachingtype',
+        choices=('memorycache', 'rediscache'),
+        default = config.CACHING["type"]
+    )
     args = parser.parse_args()
 
     config.DEBUG = args.debug
 
     if args.no_cache:
         config.CACHING = False
+
+    if args.cachingtype:
+        config.CACHING["type"] = args.cachingtype
 
     config.HTTP_TIMEOUT = args.timeout
 
