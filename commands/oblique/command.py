@@ -1,5 +1,7 @@
 import random
 
+CACHEABLE = False
+
 advices = [
     "Abandon normal instruments",
     "Accept advice",

@@ -50,7 +50,7 @@ def run_command(name, method = None):
         params = params
     )
 
-    cacheable = hasattr(cmd, "CACHEABLE")
+    cacheable = getattr(cmd, "CACHEABLE", False)
     logging.debug("Command cacheable: " + str(cacheable))
 
     if not response["error"] and config.CACHING and cacheable:
