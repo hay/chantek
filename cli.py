@@ -5,7 +5,7 @@ Usage:
 python cli.py <cmdname> -m <method> -q <query> -ak <argument key> -av <argument value>
 """
 
-import json, argparse, logging, sys
+import json, argparse, logging, sys, shutil
 from commandsmanager import CommandsManager
 
 commands = CommandsManager()
@@ -38,6 +38,10 @@ def run(args):
 
     return result
 
+def init_command(name):
+    print "Creating new command '%s'" % name
+    shutil.copytree("etc/command-template", "commands/%s" % name)
+
 def main():
     parser.add_argument('cmdname', nargs = '?', help="Name of the command")
     parser.add_argument('-m', '--method', help="Command method")
@@ -45,8 +49,14 @@ def main():
     parser.add_argument('-l', '--list', help="List all available commands", action="store_true")
     parser.add_argument('-d', '--debug', help="Show debug data", action="store_true")
     parser.add_argument('-v', '--verbose', help="Show verbose results", action="store_true")
+    parser.add_argument('--init', help="Create new command")
 
     args = parser.parse_args()
+
+    if args.init:
+        init_command(args.init)
+        sys.exit()
+
     result = run(args)
 
     if isinstance(result, str):
