@@ -24,7 +24,7 @@ class CommandsManager:
 
         cmddirs = os.walk(COMMANDS_PATH).next()[1]
 
-        logging.debug("Commands we're going to load %s" % cmddirs)
+        logging.info("Commands we're going to load %s" % cmddirs)
 
         for cmdname in cmddirs:
             logging.debug("Parsing <%s>" % cmdname)

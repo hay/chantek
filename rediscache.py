@@ -14,6 +14,12 @@ class Cache():
             db = conf["db"]
         )
 
+        # Try getting the size, if this fails Redis is properly not online
+        try:
+            self.cache.dbsize()
+        except:
+            logging.error("Could not connect to Redis database!")
+
     def keys(self):
         return self.cache.keys()
 

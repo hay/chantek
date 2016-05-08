@@ -2,6 +2,7 @@ import argparse, os, json, time, logging, config
 from commandsmanager import CommandsManager
 from flask import Flask, request, make_response
 from urlparse import urlparse
+from pprint import pprint
 
 app = Flask(__name__)
 cache = None
@@ -41,7 +42,7 @@ def run_command(name, method = None):
 
     params = request.args.to_dict()
 
-    if config.CACHING and url in cache:
+    if config.CACHING["enabled"] and url in cache:
         return cache[url]
 
     cmd, response = commands.run(
@@ -53,7 +54,7 @@ def run_command(name, method = None):
     cacheable = getattr(cmd, "CACHEABLE", False)
     logging.debug("Command cacheable: " + str(cacheable))
 
-    if not response["error"] and config.CACHING and cacheable:
+    if not response["error"] and config.CACHING["enabled"] and cacheable:
         # We also need to check if this cache is only for specific methods
         if isinstance(cmd.CACHEABLE, tuple):
             if method in cmd.CACHEABLE:
@@ -84,7 +85,7 @@ def command(cmdname):
     return json_response(response)
 
 def get_cache():
-    if not config.CACHING:
+    if not config.CACHING["enabled"]:
         return False
 
     cachemodule = __import__(config.CACHING['type'])
@@ -117,7 +118,7 @@ def main():
     config.DEBUG = args.debug
 
     if args.no_cache:
-        config.CACHING = False
+        config.CACHING["enabled"] = False
 
     if args.cachingtype:
         config.CACHING["type"] = args.cachingtype
@@ -129,7 +130,9 @@ def main():
     if config.DEBUG:
         logging.getLogger().setLevel(logging.DEBUG)
 
-    logging.debug("Cache enabled:" + str(config.CACHING))
+    logging.info("Cache configuration: %s" % json.dumps(config.CACHING))
+    logging.info("Cache enabled: %s" % config.CACHING["enabled"])
+
     cache = get_cache()
 
     commands = CommandsManager()
