@@ -1,0 +1,9 @@
+[Unit]
+Description=Chantek
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python /var/lib/chantek/server.py
+
+[Install]
+WantedBy=multi-user.target
