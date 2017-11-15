@@ -11,7 +11,7 @@ def apirequest(url, params):
 def mapobj(obj, fn):
     newobj = {}
 
-    for (key, val) in obj.iteritems():
+    for (key, val) in obj.items():
         newobj[key] = fn(val)
 
     return newobj
@@ -31,4 +31,4 @@ def sprintf(string, args):
     return string % args[:string.count("%s")]
 
 def dump(val):
-    print json.dumps(val, indent = 4)
+    print(json.dumps(val, indent = 4))

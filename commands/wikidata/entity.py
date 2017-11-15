@@ -86,8 +86,8 @@ class WikidataEntity:
 
         claims = []
 
-        for (prop, claimlist) in clist.iteritems():
-            values = map(self.get_claim_values, claimlist)
+        for (prop, claimlist) in clist.items():
+            values = list(map(self.get_claim_values, claimlist))
             self.entitycache[prop] = False # cache for query later
 
             claims.append({
@@ -149,15 +149,15 @@ class WikidataEntity:
         return claims
 
     def get_aliases(self, aliases):
-        for (key, val) in aliases.iteritems():
-            aliases[key] = map(lambda i:i["value"], val)
+        for (key, val) in aliases.items():
+            aliases[key] = [i["value"] for i in val]
 
         return aliases
 
     def get_sitelinks(self, sitelinks):
         links = {}
 
-        for (key, val) in sitelinks.iteritems():
+        for (key, val) in sitelinks.items():
             lang = val["site"].replace("wiki", "")
             title = val["title"]
 
@@ -226,7 +226,7 @@ class WikidataEntity:
         return item
 
     def iterimages(self, entities):
-        for qid, entity in entities.iteritems():
+        for qid, entity in entities.items():
             if "claims" not in entity:
                 continue
 
@@ -281,7 +281,7 @@ class WikidataEntity:
         entities = {}
 
         if isinstance(self.ids, dict):
-            ids = self.ids.keys()
+            ids = list(self.ids.keys())
         else:
             ids = self.ids
 
@@ -295,7 +295,7 @@ class WikidataEntity:
             entities.update(req)
 
 
-        for id_, entity in entities.items():
+        for id_, entity in list(entities.items()):
             entities[id_] = self.format(entities[id_])
 
         return entities
@@ -338,7 +338,7 @@ class WikidataEntity:
         if "entities" in r:
             labels = {}
 
-            for qid, data in r["entities"].iteritems():
+            for qid, data in r["entities"].items():
                 if "labels" in data:
                     labels[qid] = data["labels"][language]["value"]
                 else:
@@ -377,7 +377,7 @@ class WikidataEntity:
         # Loop until we get an item that has claims
         while True:
             entity = self._get_random_entity(args)
-            data = entity[entity.keys()[0]]
+            data = entity[list(entity.keys())[0]]
 
             if "claims" in data:
                 break

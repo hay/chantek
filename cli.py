@@ -6,7 +6,7 @@ python cli.py <cmdname> -m <method> -q <query> -ak <argument key> -av <argument 
 """
 
 import json, argparse, logging, sys, shutil
-from commandsmanager import CommandsManager
+from .commandsmanager import CommandsManager
 
 commands = CommandsManager()
 parser = argparse.ArgumentParser(description = "A command line script for the Chantek server.")
@@ -16,7 +16,7 @@ def run(args):
         logging.getLogger().setLevel(logging.DEBUG)
 
     if args.list:
-        return "\n".join(commands.listall().keys())
+        return "\n".join(list(commands.listall().keys()))
 
     if not args.cmdname:
         parser.print_help()
@@ -39,7 +39,7 @@ def run(args):
     return result
 
 def init_command(name):
-    print "Creating new command '%s'" % name
+    print("Creating new command '%s'" % name)
     shutil.copytree("etc/command-template", "commands/%s" % name)
 
 def main():
@@ -60,9 +60,9 @@ def main():
     result = run(args)
 
     if isinstance(result, str):
-        print result
+        print(result)
     else:
-        print json.dumps(result, indent = 4)
+        print(json.dumps(result, indent = 4))
 
 if __name__ == "__main__":
     main()

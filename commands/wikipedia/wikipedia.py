@@ -18,7 +18,7 @@ def _getfirstpage(data):
         return False
 
     # Sigh.. awful Wikipedia API crap
-    pageid = data['query']['pages'].keys()[0]
+    pageid = list(data['query']['pages'].keys())[0]
     return data["query"]["pages"][pageid]
 
 def _extracts(q, lang, intro = True):
@@ -119,7 +119,7 @@ def article(q, lang, imgwidth, cleanup):
         "images" : _getimages(q, lang, imgwidth)
     }
 
-def extracts(q, lang, imgwidth):
+def extracts(q, lang, imgwidth, cleanup):
     text = _extracts(q, lang, False)
 
     if not text or text["extract"].strip() == "":
@@ -172,7 +172,7 @@ def imageinfo(images, lang):
         "iiprop" : "url"
     })
 
-    return map(_imageinfo_format, data["query"]["pages"].values())
+    return list(map(_imageinfo_format, list(data["query"]["pages"].values())))
 
 def articleimages(q, lang):
     data = request(lang, {
@@ -186,9 +186,9 @@ def articleimages(q, lang):
     if not page or not "images" in page:
         return False
 
-    return map(lambda x:x["title"], page["images"])
+    return [x["title"] for x in page["images"]]
 
-def define(q, lang, imgwidth):
+def define(q, lang, imgwidth, cleanup):
     return _extracts(q, lang, True)
 
 def suggest(q, lang):
@@ -215,7 +215,7 @@ def pageviews(q, lang):
     stats = r.json()
 
     total = 0
-    for (key, view) in stats["daily_views"].iteritems():
+    for (key, view) in stats["daily_views"].items():
         total = total + int(view)
 
     stats["total"] = total
@@ -246,7 +246,7 @@ def links(q, lang):
     if not data:
         return False
 
-    return map(_formatlink, data["query"]["pages"].values())
+    return list(map(_formatlink, list(data["query"]["pages"].values())))
 
 def linkshere(q, lang):
     data = request(lang, {
@@ -256,7 +256,7 @@ def linkshere(q, lang):
         "lhlimit" : 500
     })
 
-    data = data["query"]["pages"].values()[0]
+    data = list(data["query"]["pages"].values())[0]
 
     if "linkshere" in data:
         data["total"] = len(data["linkshere"])
@@ -273,7 +273,7 @@ def langlinks(q, lang):
         "lllimit" : 500
     })
 
-    data = data["query"]["pages"].values()[0]
+    data = list(data["query"]["pages"].values())[0]
 
     if "langlinks" in data:
         data["total"] = len(data["langlinks"])

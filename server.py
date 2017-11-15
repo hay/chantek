@@ -1,7 +1,7 @@
 import argparse, os, json, time, logging, config
 from commandsmanager import CommandsManager
 from flask import Flask, request, make_response
-from urlparse import urlparse
+from urllib.parse import urlparse
 from pprint import pprint
 
 app = Flask(__name__)
@@ -42,7 +42,7 @@ def run_command(name, method = None):
 
     params = request.args.to_dict()
 
-    if config.CACHING["enabled"] and url in cache:
+    if config.CACHING.get("enabled", False) and url in cache:
         return cache[url]
 
     cmd, response = commands.run(
@@ -54,7 +54,7 @@ def run_command(name, method = None):
     cacheable = getattr(cmd, "CACHEABLE", False)
     logging.debug("Command cacheable: " + str(cacheable))
 
-    if not response["error"] and config.CACHING["enabled"] and cacheable:
+    if not response["error"] and config.CACHING.get("enabled", False) and cacheable:
         # We also need to check if this cache is only for specific methods
         if isinstance(cmd.CACHEABLE, tuple):
             if method in cmd.CACHEABLE:
@@ -85,7 +85,7 @@ def command(cmdname):
     return json_response(response)
 
 def get_cache():
-    if not config.CACHING["enabled"]:
+    if not config.CACHING.get("enabled", False):
         return False
 
     cachemodule = __import__(config.CACHING['type'])
@@ -131,15 +131,14 @@ def main():
         logging.getLogger().setLevel(logging.DEBUG)
 
     logging.info("Cache configuration: %s" % json.dumps(config.CACHING))
-    logging.info("Cache enabled: %s" % config.CACHING["enabled"])
+    logging.info("Cache enabled: %s" % config.CACHING.get("enabled", False))
 
     cache = get_cache()
 
     commands = CommandsManager()
 
+    logging.info("Going to run a server on %s:%s" %(config.HOST, config.PORT))
     app.run(port = config.PORT, host = config.HOST)
-
-    logging.info("Chantek server running")
 
 if __name__ == "__main__":
     main()

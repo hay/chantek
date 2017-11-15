@@ -1,5 +1,5 @@
 import util, json
-from entity import WikidataEntity
+from .entity import WikidataEntity
 
 API_ENDPOINT = "https://wdq.wmflabs.org/api";
 

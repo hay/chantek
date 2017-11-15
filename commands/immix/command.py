@@ -1,4 +1,4 @@
-import immix
+from . import immix
 
 CACHEABLE = True
 

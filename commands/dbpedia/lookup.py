@@ -33,7 +33,7 @@ def suggest(args):
 
     return {
         "query" : q,
-        "suggestions" : map(lambda i:i["label"], res["results"])
+        "suggestions" : [i["label"] for i in res["results"]]
     }
 
 def define(args):

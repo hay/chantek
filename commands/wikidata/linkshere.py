@@ -1,4 +1,4 @@
-from entity import WikidataEntity
+from .entity import WikidataEntity
 import util, json
 
 API_ENDPOINT = "https://www.wikidata.org/w/api.php";
@@ -21,7 +21,7 @@ class WikidataLinkshere:
         if "-1" in r["query"]["pages"]:
             return False
 
-        links = r["query"]["pages"].itervalues().next().get("linkshere", None)
+        links = iter(r["query"]["pages"].values()).next().get("linkshere", None)
 
         if links:
             return [ i["title"] for i in links ]

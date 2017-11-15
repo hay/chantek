@@ -1,4 +1,4 @@
-import bengwiki
+from . import bengwiki
 
 CACHEABLE = True
 

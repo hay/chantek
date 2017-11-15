@@ -1,6 +1,5 @@
 from operator import itemgetter
-import util, requests, os
-import unicodecsv as csv
+import util, requests, os, csv
 
 API_ENDPOINT = "http://data.beeldengeluid.nl/api/"
 SCHEME_ENDPOINT = "http://data.beeldengeluid.nl/gtaa/%s"

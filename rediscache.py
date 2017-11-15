@@ -4,10 +4,10 @@ KEY_PREFIX = "chantek:cache:"
 
 class Cache():
     def __init__(self, expires = 600):
-        logging.debug(u"Enabling redis cache with expire time %s" % expires)
+        logging.debug("Enabling redis cache with expire time %s" % expires)
         self.expires = expires
         conf = config.REDIS
-        logging.debug(u"Redis cache has these parameters: " + json.dumps(conf))
+        logging.debug("Redis cache has these parameters: " + json.dumps(conf))
         self.cache = redis.StrictRedis(
             host = conf["host"],
             port = conf["port"],
@@ -21,7 +21,7 @@ class Cache():
             logging.error("Could not connect to Redis database!")
 
     def keys(self):
-        return self.cache.keys()
+        return list(self.cache.keys())
 
     def __len__(self):
         return self.cache.dbsize()
@@ -31,15 +31,15 @@ class Cache():
 
     def __getitem__(self, key):
         if self.cache.exists(KEY_PREFIX + key):
-            logging.debug(u"Cache HIT for %s" % key)
+            logging.debug("Cache HIT for %s" % key)
             val = self.cache.get(KEY_PREFIX + key)
             return json.loads(val)
         else:
-            logging.debug(u"Cache MISS for %s" % key)
+            logging.debug("Cache MISS for %s" % key)
             return None
 
     def __setitem__(self, key, value):
-        logging.debug(u"Saving %s in cache" % key)
+        logging.debug("Saving %s in cache" % key)
         value = json.dumps(value)
         self.cache.set(KEY_PREFIX + key, value)
 

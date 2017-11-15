@@ -1,4 +1,4 @@
-import wikipedia
+from . import wikipedia
 
 CACHEABLE = True
 

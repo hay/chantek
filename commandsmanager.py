@@ -22,7 +22,7 @@ class CommandsManager:
 
         logging.info("Parsing commands")
 
-        cmddirs = os.walk(COMMANDS_PATH).next()[1]
+        cmddirs = [c for c in os.listdir(COMMANDS_PATH) if c[0] != "_"]
 
         logging.info("Commands we're going to load %s" % cmddirs)
 
@@ -91,10 +91,10 @@ class CommandsManager:
                 cmdmethod = cmdmethod,
                 name = name
             )
-        except Exception, e:
+        except Exception as e:
             data_response.update({
                 "error" : {
-                    "message" : "<%s>: %s" % (name, e.message)
+                    "message" : "<%s>: %s" % (name, e)
                 },
                 "response" : False
             })

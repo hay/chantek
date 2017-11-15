@@ -1,4 +1,4 @@
-import gtaa
+from . import gtaa
 
 CACHEABLE = True
 

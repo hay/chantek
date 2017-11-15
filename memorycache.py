@@ -2,12 +2,12 @@ import time, logging
 
 class Cache():
     def __init__(self, expires = 600):
-        logging.debug(u"Enabling memory cache, expires %s" % expires)
+        logging.debug("Enabling memory cache, expires %s" % expires)
         self.expires = expires
         self.cache = {}
 
     def keys(self):
-        return self.cache.keys()
+        return list(self.cache.keys())
 
     def __len__(self):
         return len(self.cache)
@@ -19,20 +19,20 @@ class Cache():
         now = int(time.time())
 
         if key not in self.cache:
-            logging.debug(u"Cache MISS for " + str(key))
+            logging.debug("Cache MISS for " + str(key))
             return None
 
         if (now - self.cache[key]["saved"]) > self.expires:
             # Cache value expired, remove and return None
-            logging.debug(unicode(key) + u" expired, empty cache")
+            logging.debug(str(key) + " expired, empty cache")
             self.cache.pop(key, None)
             return None
         else:
-            logging.debug(u"Cache HIT for " + str(key))
+            logging.debug("Cache HIT for " + str(key))
             return self.cache[key]["value"]
 
     def __setitem__(self, key, value):
-        logging.debug(u"Saving %s in cache" % str(key))
+        logging.debug("Saving %s in cache" % str(key))
 
         self.cache[key] = {
             "value" : value,

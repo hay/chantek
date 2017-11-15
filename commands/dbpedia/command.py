@@ -1,4 +1,4 @@
-import lookup
+from . import lookup
 
 CACHEABLE = True
 

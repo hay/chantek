@@ -64,7 +64,7 @@ def imageinfo(args):
     q = [q]
 
     # Prefix with 'File:' if it's not there
-    q = map(lambda f:f if f.startswith(FILE_PREFIX) else FILE_PREFIX + f, q)
+    q = [f if f.startswith(FILE_PREFIX) else FILE_PREFIX + f for f in q]
 
     data = request({
         "action" : "query",

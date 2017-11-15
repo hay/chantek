@@ -1,7 +1,7 @@
-from entity import WikidataEntity
-from search import WikidataSearch
-from query import WikidataQuery
-from linkshere import WikidataLinkshere
+from .entity import WikidataEntity
+from .search import WikidataSearch
+from .query import WikidataQuery
+from .linkshere import WikidataLinkshere
 
 methods = ("entity", "search", "query", "random", "labels", "linkshere")
 CACHEABLE = ("entity", "search", "query", "labels", "linkshere") # 'Random' is not cacheable

@@ -1,4 +1,4 @@
-import util, requests, xmltodict, urllib
+import util, requests, xmltodict, urllib.request, urllib.parse, urllib.error
 from pyquery import PyQuery as pq
 from commands.gtaa import gtaa
 
@@ -8,7 +8,7 @@ WIKI_ENDPOINT = "http://beeldengeluidwiki.nl/api.php"
 
 def _sanitize(string):
     string = string.replace(RESOLVER_ENDPOINT, "").replace("_", " ").replace("-", "%")
-    string = urllib.unquote(string).encode('latin-1')
+    string = urllib.parse.unquote(string).encode('latin-1')
     return string
 
 def _pluck(obj, node, key):
@@ -21,10 +21,10 @@ def _pluck(obj, node, key):
         else:
             return obj[node][key]
     else:
-        items = map(lambda i:i[key], obj[node])
+        items = [i[key] for i in obj[node]]
 
         if key == "@rdf:resource":
-            return map(_sanitize, items)
+            return list(map(_sanitize, items))
         else:
             return items
 
@@ -103,7 +103,7 @@ def pagetext(q):
         return False
 
     rev = r["query"]["pages"]
-    rev = rev.itervalues().next()
+    rev = next(iter(rev.values()))
 
     return _parsehtml(rev["revisions"][0]["*"])
 
