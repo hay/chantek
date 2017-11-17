@@ -6,7 +6,7 @@ python cli.py <cmdname> -m <method> -q <query> -ak <argument key> -av <argument 
 """
 
 import json, argparse, logging, sys, shutil
-from .commandsmanager import CommandsManager
+from commandsmanager import CommandsManager
 
 commands = CommandsManager()
 parser = argparse.ArgumentParser(description = "A command line script for the Chantek server.")
@@ -22,7 +22,7 @@ def run(args):
         parser.print_help()
         return
 
-    result = commands.run(
+    cmd, result = commands.run(
         cmdname = args.cmdname,
         cmdmethod = args.method,
         params = {
