@@ -1,6 +1,6 @@
 Chantek
 =======
-An unaspiring read-only HTTP API server written in Python.
+An unaspiring read-only HTTP API server written in Python 3.
 
 Easily extended with your own commands.
 
@@ -15,7 +15,7 @@ Try the live demo: [http://api.haykranen.nl](http://api.haykranen.nl)
 ## Running (production)
 To run the server simply run `server.py` in the root. There's also a `uwsgi.ini` configuration example for [production use](http://www.haykranen.nl/2014/11/15/running-a-python-flask-app-with-nginx-using-uwsgi/).
 
-Another option is simply running this with an init script (see `etc/ubuntu-init.conf` for an example), and proxy the calls using something like Nginx. See `etc/nginx-example.conf` for an example.
+Another option is simply running this with an init / systemd script (see `etc/ubuntu-init.conf` for an example), and proxy the calls using something like Nginx. See `etc/nginx-example.conf` for an example.
 
 ## Running (development)
 
