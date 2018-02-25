@@ -22,7 +22,7 @@ class CommandsManager:
 
         logging.info("Parsing commands")
 
-        cmddirs = [c for c in os.listdir(COMMANDS_PATH) if c[0] != "_"]
+        cmddirs = [c for c in os.listdir(COMMANDS_PATH) if c[0] != "_" and c[0] != "."]
 
         logging.info("Commands we're going to load %s" % cmddirs)
 
