@@ -1,8 +1,9 @@
-import argparse, os, json, time, logging, config
+import argparse, os, json, logging, config
 from commandsmanager import CommandsManager
 from flask import Flask, request, make_response
 from urllib.parse import urlparse
 from pprint import pprint
+from time import time
 
 app = Flask(__name__)
 cache = None
@@ -34,6 +35,10 @@ def ignore_url(url):
     return url in IGNORED_URLS
 
 def run_command(name, method = None):
+    # Get time for request when debug is on
+    if config.DEBUG:
+        start = time()
+
     url = get_urlpath(request.url)
     logging.debug("Request: " + url)
 
@@ -62,6 +67,13 @@ def run_command(name, method = None):
         else:
             # Not specific, simply cache this
             cache[url] = response
+
+    if config.DEBUG:
+        response_time = time() - start
+
+        response["debug"] = {
+            "response_time" : response_time
+        }
 
     return response
 
