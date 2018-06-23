@@ -119,5 +119,5 @@ advices = [
     "..."
 ]
 
-def run(args):
+def run():
     return random.choice(advices)

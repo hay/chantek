@@ -1,7 +1,8 @@
+import inspect
+import json
+import jsonpickle
 import logging
 import os
-import json
-import inspect
 from config import PATH
 from argparser import ArgumentsParser
 from __init__ import __version__ as version
@@ -18,8 +19,29 @@ class CommandsManager:
         # < http://stackoverflow.com/questions/2724260 >
         return __import__("commands.%s.command" % name, fromlist="commands")
 
+    # List all commands with arguments and methods
     def listall(self):
-        return self.commands
+        commands = {}
+        cmdnames = sorted(list(set(self.commands.values())))
+
+        for cmdname in cmdnames:
+            cmd = self.get(cmdname)
+
+            if cmd.__doc__:
+                description = cmd.__doc__.strip()
+            else:
+                description = None
+
+            commands[cmdname] = {
+                "aliases" : getattr(cmd, "aliases", None),
+                "arguments" : getattr(cmd, "arguments", None),
+                "cacheable" : getattr(cmd, "CACHEABLE", None),
+                "description" : description,
+                "methods" : getattr(cmd, "methods", None),
+                "name" : cmdname
+            }
+
+        return json.loads(jsonpickle.encode(commands, unpicklable = False))
 
     def parse(self):
         commands = {}

@@ -1,3 +1,6 @@
+"""
+Query the magic eightball
+"""
 import random
 
 predictions = [
