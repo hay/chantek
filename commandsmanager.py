@@ -47,6 +47,13 @@ class CommandsManager:
         logging.debug("Executing command %s/%s" % (name, cmdmethod))
         logging.debug("With params " + json.dumps(params, indent = 4))
 
+        # If there is an 'arguments' dict, use that to fill in default
+        # values for the params
+        if hasattr(cmd, "arguments"):
+            logging.debug(f"Parsing default arguments for <{name}>")
+            parser = ArgumentsParser(params, cmd.arguments, cmdmethod)
+            params = parser.get_params()
+
         if hasattr(cmd, "methods"):
             # Python casts tuples with one value to a string, so we
             # need to explicitely make it a tuple
@@ -58,19 +65,12 @@ class CommandsManager:
                not isinstance(cmd.methods, list):
                 raise Exception("Methods need to be of type tuple or list")
 
-            # If there is an 'arguments' dict, use that to fill in default
-            # values for the params
-            if hasattr(cmd, "arguments"):
-                logging.debug(f"Parsing default arguments for <{name}>")
-                parser = ArgumentsParser(params, cmd.arguments, cmdmethod)
-                params = parser.get_params()
-
-            if cmdmethod in cmd.methods:
-                response = cmd.run(params, cmdmethod)
-            elif not cmdmethod:
+            if not cmdmethod:
                 raise TypeError(f"This command needs one of these methods: {cmd.methods}")
-            else:
+            elif cmdmethod not in cmd.methods:
                 raise Exception("Invalid method for <%s>" % name)
+
+            response = cmd.run(params, cmdmethod)
         else:
             response = cmd.run(params)
 
