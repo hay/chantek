@@ -25,5 +25,5 @@ predictions = [
 
 aliases = ["8b", "8ball"]
 
-def run(args):
+def run():
     return random.choice(predictions)

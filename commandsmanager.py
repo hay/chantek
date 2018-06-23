@@ -1,4 +1,7 @@
-import logging, os, json
+import logging
+import os
+import json
+import inspect
 from config import PATH
 from argparser import ArgumentsParser
 from __init__ import __version__ as version
@@ -47,6 +50,9 @@ class CommandsManager:
         logging.debug("Executing command %s/%s" % (name, cmdmethod))
         logging.debug("With params " + json.dumps(params, indent = 4))
 
+        if not hasattr(cmd, "run"):
+            raise TypeError("Chantek commands required a 'run' method")
+
         # If there is an 'arguments' dict, use that to fill in default
         # values for the params
         if hasattr(cmd, "arguments"):
@@ -72,7 +78,14 @@ class CommandsManager:
 
             response = cmd.run(params, cmdmethod)
         else:
-            response = cmd.run(params)
+            # Check if this command wants the 'params' array or not
+            spec = inspect.getargspec(cmd.run)
+
+            if len(spec.args) == 0:
+                logging.debug("Command has no arguments, not providing params")
+                response = cmd.run()
+            else:
+                response = cmd.run(params)
 
         return response
 
