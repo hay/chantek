@@ -1,5 +1,6 @@
 import logging, os, json
 from config import PATH
+from argparser import ArgumentsParser
 from __init__ import __version__ as version
 
 COMMANDS_PATH = PATH + "/commands"
@@ -53,11 +54,21 @@ class CommandsManager:
                 cmd.methods = (cmd.methods, )
 
             # Check if methods is not something weird
-            if not isinstance(cmd.methods, tuple):
-                raise Exception("Methods need to be of type tuple")
+            if not isinstance(cmd.methods, tuple) and \
+               not isinstance(cmd.methods, list):
+                raise Exception("Methods need to be of type tuple or list")
+
+            # If there is an 'arguments' dict, use that to fill in default
+            # values for the params
+            if hasattr(cmd, "arguments"):
+                logging.debug(f"Parsing default arguments for <{name}>")
+                parser = ArgumentsParser(params, cmd.arguments, cmdmethod)
+                params = parser.get_params()
 
             if cmdmethod in cmd.methods:
                 response = cmd.run(params, cmdmethod)
+            elif not cmdmethod:
+                raise TypeError(f"This command needs one of these methods: {cmd.methods}")
             else:
                 raise Exception("Invalid method for <%s>" % name)
         else:

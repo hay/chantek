@@ -304,6 +304,9 @@ class WikidataEntity:
         # Parse the query
         q = args["q"]
 
+        if not q:
+            raise TypeError("Entity ID can't be False")
+
         # Convert to a list, prepended with a q if needed
         q = [ qid if qid[0] == "Q" else "Q" + qid for qid in q.split(",") ]
 
