@@ -1,6 +1,6 @@
-import util, json, time, math
-
+import util, json, time, math, requests
 from commands.wmcommons import wmcommons
+from .entity_ld import WikidataEntityLD
 
 API_ENDPOINT = "https://www.wikidata.org/w/api.php";
 DEFAULT_PROPS = ("info", "labels", "descriptions", "datatype", "claims", "aliases", "sitelinks")
@@ -11,7 +11,19 @@ class WikidataEntity:
 
         # If set to 'True' and only one language is given, the value
         # is directly given as value for a key instead of an object
-        # e.g. { "propery_labels" : "Birth name" } vs { "property_labels" : { "en" : "Birth name" }}
+        #
+        # e.g.
+        #   {
+        #       "propery_labels" : "Birth name"
+        #   }
+        #
+        # vs
+        #   {
+        #       "property_labels" : {
+        #           "en" : "Birth name"
+        #       }
+        #   }
+        #
         self.flattenlanguages = True
 
     def get_claim_values(self, claim):
@@ -22,7 +34,13 @@ class WikidataEntity:
 
         datatype = snak["datatype"]
         val = { "datatype" : datatype }
-        value = snak["datavalue"]["value"]
+
+        if snak["snaktype"] == "novalue":
+            return {
+                "datatype" : "novalue"
+            }
+        else:
+            value = snak["datavalue"]["value"]
 
         if datatype == "wikibase-item":
             qid = "Q" + str(value["numeric-id"])
@@ -303,7 +321,17 @@ class WikidataEntity:
     def entity(self, args):
         # Parse the query
         q = args["q"]
+        fmt = args.get("format", None)
 
+        # Check if we have a json-ld or json-ld-simplified format,
+        # and that case, do something completely different
+        if fmt == "json-ld":
+            entity = WikidataEntityLD(q)
+            return entity.as_json_ld()
+
+        if fmt == "json-ld-simplified":
+            entity = WikidataEntityLD(q, args["language"])
+            return entity.as_json_ld_simplified()
         if not q:
             raise TypeError("Entity ID can't be False")
 
@@ -351,19 +379,23 @@ class WikidataEntity:
         else:
             return {"error" : "Could not get labels"}
 
-    def _get_random_qid(self, args):
+    def _get_random_qids(self, args, count):
         r = util.apirequest(API_ENDPOINT, {
-            "languages" : "|".join(args["language"]),
             "action" : "query",
             "list" : "random",
             "rnnamespace" : 0,
-            "languagefallback" : 1,
-            "format" : "json"
+            "format" : "json",
+            "rnlimit" : count
         })
 
         if "query" not in r:
             return {"error" : "Could not get a random item"}
+        else:
+            return r
 
+    # Just a wrapper for backwards compatibility
+    def _get_random_qid(self, args):
+        r = self._get_random_qids(args, 1)
         return r["query"]["random"][0]["title"]
 
     def _get_random_entity(self, args):
