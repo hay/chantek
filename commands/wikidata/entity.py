@@ -355,29 +355,31 @@ class WikidataEntity:
 
     def labels(self, items, language):
         # Now add a "Q" in front of the id if its not already there
-        items = [ qid if qid[0] == "Q" else "Q" + id for qid in items]
+        all_items = [ qid if qid[0] == "Q" else f"Q{qid}" for qid in items]
 
-        r = util.apirequest(API_ENDPOINT, {
-            "languages" : language,
-            "action" : "wbgetentities",
-            "format" : "json",
-            "props" : "labels",
-            "languagefallback" : 1,
-            "ids" : "|".join(items)
-        })
+        # Batch in chunks of 50 because the WD api doesn't accept more
+        labels = {}
 
-        if "entities" in r:
-            labels = {}
+        for items in util.batch_iterable(all_items, 50):
+            r = util.apirequest(API_ENDPOINT, {
+                "languages" : language,
+                "action" : "wbgetentities",
+                "format" : "json",
+                "props" : "labels",
+                "languagefallback" : 1,
+                "ids" : "|".join(items)
+            })
+
+            if not "entities" in r:
+                continue
 
             for qid, data in r["entities"].items():
                 if "labels" in data:
                     labels[qid] = data["labels"][language]["value"]
                 else:
-                    labels[qid] = False
+                    labels[qid] = None
 
-            return labels
-        else:
-            return {"error" : "Could not get labels"}
+        return labels
 
     def _get_random_qids(self, args, count):
         r = util.apirequest(API_ENDPOINT, {
