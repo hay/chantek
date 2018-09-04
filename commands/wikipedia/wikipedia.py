@@ -1,16 +1,21 @@
 import requests, json, re, time
 from pyquery import PyQuery as pq
 from commands.wmcommons import wmcommons
+from jq import jq
+from dataknead import Knead
 
-API_ENDPOINT = "http://%s.wikipedia.org/w/api.php";
+API_ENDPOINT = "https://%s.wikipedia.org/w/api.php"
+WIKIDATA_ENDPOINT = "https://www.wikidata.org/w/api.php"
 
-def request(lang, params):
-    url = API_ENDPOINT % lang
+def request(lang, params, wikidata = False):
+    if wikidata:
+        url = WIKIDATA_ENDPOINT
+    else:
+        url = API_ENDPOINT % lang
+
     params.update({ "format" : "json" })
     r = requests.get(url, params = params)
-
     data = r.json()
-
     return data
 
 def _getfirstpage(data):
@@ -281,3 +286,67 @@ def langlinks(q, lang):
         data["total"] = 0
 
     return data
+
+def _add_descriptions_to_qids(pages, lang):
+    qids = [p["qid"] for p in pages]
+
+    data = request(lang = None, wikidata = True, params = {
+        "action" : "wbgetentities",
+        "ids" : "|".join(qids),
+        "props" : "descriptions",
+        "languages" : lang
+    })
+
+    descriptions = data["entities"]
+
+    for p in pages:
+        qid = p["qid"]
+        desc = descriptions[qid]["descriptions"].get("nl", None)
+
+        if desc:
+            p["description"] = desc.get("value", None)
+        else:
+            p["descrtipion"] = None
+
+    return pages
+
+def _add_qids_to_pageids(pages, lang):
+    pageids = [str(p["pageid"]) for p in pages]
+
+    data = request(lang, {
+        "action" : "query",
+        "prop" : "pageprops",
+        "pageids" : "|".join(pageids)
+    })
+
+    if not "query" in data:
+        for p in pages:
+            p["qid"] = None
+
+        return pages
+
+    result = data["query"]["pages"]
+
+    for page in pages:
+        pid = page["pageid"]
+        page["qid"] = result[str(pid)]["pageprops"]["wikibase_item"]
+
+    pages = _add_descriptions_to_qids(pages, lang)
+
+    return pages
+
+def reconcile(q, lang):
+    data = request(lang, {
+        "action" : "query",
+        "list" : "search",
+        "srsearch" : q,
+        "srlimit" : 3,
+        "srinterwiki" : True,
+        "srprop" : "score|pageid",
+        "utf8" : True
+    })
+
+    results = jq(".query.search").transform(data)
+    results = _add_qids_to_pageids(results, lang)
+
+    return results

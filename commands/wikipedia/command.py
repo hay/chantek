@@ -4,14 +4,15 @@ CACHEABLE = True
 
 methods = (
     "article",
-    "extracts",
     "define",
-    "suggest",
-    "pageviews",
-    "linkshere",
+    "extracts",
     "langlinks",
+    "links",
+    "linkshere",
+    "pageviews",
+    "reconcile",
     "statistics",
-    "links"
+    "suggest",
 )
 
 def run(args, method):
@@ -65,3 +66,6 @@ def run(args, method):
             "linkshere" : linkshere["total"],
             "pageviews" : pageviews["total"]
         }
+
+    if method == "reconcile":
+        return wikipedia.reconcile(q, lang)
