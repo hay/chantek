@@ -1,5 +1,10 @@
-import requests, json, logging
+import requests
+import json
+import logging
+import toml
+
 from config import PATH, HTTP_TIMEOUT
+from pathlib import Path
 
 def apirequest(url, params):
     logging.debug("Now getting '%s' with parameters %s" % (url, params))
@@ -40,3 +45,11 @@ batch([1,2,3,4], 2) == [1,2],[3,4]
 def batch_iterable(iterable, n = 1):
     for i in range(0, len(iterable), n):
         yield iterable[i:i + n]
+
+def get_version():
+    confpath = Path(PATH) / "pyproject.toml"
+
+    with open(confpath) as f:
+        project = toml.load(f)
+        version = project["tool"]["poetry"]["version"]
+        return version

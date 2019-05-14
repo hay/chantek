@@ -3,11 +3,14 @@ import json
 import jsonpickle
 import logging
 import os
-from config import PATH
+import toml
+
 from argparser import ArgumentsParser
-from __init__ import __version__ as version
+from config import PATH
+from util import get_version
 
 COMMANDS_PATH = PATH + "/commands"
+VERSION = get_version()
 
 class CommandsManager:
     def __init__(self):
@@ -125,7 +128,7 @@ class CommandsManager:
             return False, self.error("<%s> does not have any methods" % name)
 
         data_response = {
-            "chantek" : version,
+            "chantek" : VERSION,
             "command" : name,
             "params" : params,
         }

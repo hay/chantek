@@ -4,11 +4,13 @@ from flask import Flask, request, make_response
 from urllib.parse import urlparse
 from pprint import pprint
 from time import time
+from util import get_version
 
 app = Flask(__name__)
 cache = None
 commands = None
 IGNORED_URLS = ("/favicon.ico")
+VERSION = get_version()
 
 def json_response(data):
     if 'pretty' in request.args:
@@ -113,8 +115,6 @@ def create_app():
 def main():
     global cache, commands
 
-    logging.info("Starting Chantek server")
-
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--debug', action="store_true")
     parser.add_argument('-nc', '--no-cache', action="store_true")
@@ -142,6 +142,7 @@ def main():
     if config.DEBUG:
         logging.getLogger().setLevel(logging.DEBUG)
 
+    logging.info(f"Starting Chantek server v{VERSION}")
     logging.info("Cache configuration: %s" % json.dumps(config.CACHING))
     logging.info("Cache enabled: %s" % config.CACHING.get("enabled", False))
 
