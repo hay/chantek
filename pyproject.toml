@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "chantek"
-version = "0.10.0"
+version = "0.10.0-alpha"
 description = "An unaspiring read-only HTTP API server written in Python"
 authors = ["Hay Kranen <huskyr@gmail.com>"]
 license = "MIT"
