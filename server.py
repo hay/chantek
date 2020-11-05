@@ -28,7 +28,7 @@ def json_response(data):
 def get_urlpath(url):
     parts = urlparse(url)
 
-    if parts.query is not "":
+    if parts.query != "":
         return "%s/?%s" % (parts.path, parts.query)
     else:
         return parts.path
