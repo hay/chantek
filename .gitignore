@@ -4,3 +4,5 @@ config.py
 *.log
 cache.json
 *.pyc
+.python-version
+.venv
